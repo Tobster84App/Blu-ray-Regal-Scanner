@@ -2,12 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Die Kamera wird genutzt, um dein Regal zu fotografieren. / The camera is used to photograph your shelf.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Fotos aus deiner Mediathek werden nur auf dem Gerät ausgewertet. / Photos from your library are only analysed on the device.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Discscanner</string>
+	<string>DiscScanner</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
