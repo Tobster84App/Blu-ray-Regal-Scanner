@@ -1,0 +1,262 @@
+{
+  "@@locale": "de",
+  "collection": "Sammlung",
+  "scanShelf": "Regal scannen",
+  "takePhoto": "Foto aufnehmen",
+  "pickFromGallery": "Aus Galerie wählen",
+  "settings": "Einstellungen",
+  "about": "Info / Über",
+  "search": "Suchen",
+  "searchCollection": "In der Sammlung suchen",
+  "emptyCollection": "Noch keine Filme. Fotografiere dein Regal, um loszulegen.",
+  "noResults": "Keine Treffer für diese Filter.",
+  "filter": "Filter",
+  "sort": "Sortierung",
+  "sortTitle": "Titel",
+  "sortYear": "Jahr",
+  "sortAdded": "Hinzugefügt",
+  "sortRating": "Eigene Bewertung",
+  "descending": "Absteigend",
+  "all": "Alle",
+  "format": "Format",
+  "genre": "Genre",
+  "watched": "Gesehen",
+  "notWatched": "Nicht gesehen",
+  "movie": "Film",
+  "tvShow": "Serie",
+  "type": "Art",
+  "resetFilters": "Filter zurücksetzen",
+  "gridView": "Rasteransicht",
+  "listView": "Listenansicht",
+  "countSummary": "{total} Titel · DVD {dvd} · Blu-ray {bluray} · UHD {uhd}",
+  "@countSummary": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "dvd": {
+        "type": "int"
+      },
+      "bluray": {
+        "type": "int"
+      },
+      "uhd": {
+        "type": "int"
+      }
+    }
+  },
+  "formatDvd": "DVD",
+  "formatBluray": "Blu-ray",
+  "formatUhd": "4K UHD",
+  "recognizing": "Erkenne Text …",
+  "preparingImage": "Bereite Foto vor …",
+  "ocrPass": "Texterkennung {n} von 3 …",
+  "@ocrPass": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "searchingTitles": "Suche Titel {done} von {total} …",
+  "@searchingTitles": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSummary": "{green} sicher · {yellow} unsicher · {red} nicht gefunden · {grey} angeschnitten",
+  "@scanSummary": {
+    "placeholders": {
+      "green": {
+        "type": "int"
+      },
+      "yellow": {
+        "type": "int"
+      },
+      "red": {
+        "type": "int"
+      },
+      "grey": {
+        "type": "int"
+      }
+    }
+  },
+  "acceptAllGreen": "Alle grünen übernehmen ({n})",
+  "@acceptAllGreen": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "addMissingSpine": "Fehlende Hülle hinzufügen",
+  "drawSpineHint": "Ziehe einen Rahmen um die Hülle.",
+  "manualSearch": "Manuell suchen",
+  "manualSearchHint": "Titel eingeben",
+  "recognizedText": "Erkannter Text",
+  "noTextRecognized": "Kein Text erkannt",
+  "suggestions": "Vorschläge",
+  "accept": "Übernehmen",
+  "accepted": "Übernommen",
+  "cutOffHint": "Diese Hülle ist am Bildrand angeschnitten. Bitte neu fotografieren.",
+  "noMatchHint": "Kein passender Titel gefunden.",
+  "addedCount": "{created} neu, {merged} Format ergänzt, {unchanged} schon vorhanden",
+  "@addedCount": {
+    "placeholders": {
+      "created": {
+        "type": "int"
+      },
+      "merged": {
+        "type": "int"
+      },
+      "unchanged": {
+        "type": "int"
+      }
+    }
+  },
+  "noTmdbKey": "Kein TMDB-Schlüssel hinterlegt. Ohne Schlüssel können keine Titel gesucht werden.",
+  "openSettings": "Einstellungen öffnen",
+  "error": "Fehler: {message}",
+  "@error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "Erneut versuchen",
+  "noSpinesFound": "Auf dem Foto wurde keine Hülle mit Text gefunden.",
+  "overview": "Inhalt",
+  "cast": "Besetzung",
+  "director": "Regie",
+  "creator": "Idee",
+  "runtimeMinutes": "{minutes} Min.",
+  "@runtimeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "seasons": "{count, plural, =1{1 Staffel} other{{count} Staffeln}}",
+  "@seasons": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tmdbRating": "TMDB {rating}",
+  "@tmdbRating": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "watchTrailer": "Trailer ansehen",
+  "myData": "Meine Angaben",
+  "formats": "Formate",
+  "edition": "Ausgabe",
+  "steelbook": "Steelbook",
+  "mediabook": "Mediabook",
+  "boxset": "Boxset",
+  "myRating": "Eigene Bewertung",
+  "noRating": "Keine",
+  "location": "Regal / Standort",
+  "notes": "Notizen",
+  "addedOn": "Hinzugefügt am {date}",
+  "@addedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "lastUpdated": "Daten vom {date}",
+  "@lastUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshData": "Daten aktualisieren",
+  "delete": "Löschen",
+  "deleteConfirm": "„{title}“ aus der Sammlung löschen?",
+  "@deleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "yes": "Ja",
+  "no": "Nein",
+  "language": "Sprache",
+  "languageSystem": "Wie das Gerät",
+  "german": "Deutsch",
+  "english": "Englisch",
+  "reloadDataQuestion": "Filmdaten in der neuen Sprache neu laden?",
+  "reloading": "Lade Filmdaten neu: {done} von {total}",
+  "@reloading": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reloadDone": "{n} Einträge aktualisiert",
+  "@reloadDone": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "greenThreshold": "Schwelle für sichere Treffer: {value}",
+  "@greenThreshold": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tmdbKey": "Eigener TMDB-Schlüssel",
+  "tmdbKeyHelp": "API-Schlüssel (v3) oder Lesezugriffstoken (v4). Wird verschlüsselt auf dem Gerät gespeichert.",
+  "tmdbKeyFromBuild": "Ein Schlüssel aus dem Build ist vorhanden. Ein eigener ersetzt ihn.",
+  "tmdbAttribution": "This product uses the TMDB API but is not endorsed or certified by TMDB.",
+  "aboutText": "Erfasse deine Film- und Seriensammlung, indem du dein Regal fotografierst. Alle Daten bleiben auf deinem Gerät. Keine Konten, keine Werbung, kein Tracking.",
+  "dataSources": "Datenquellen",
+  "textRecognitionInfo": "Texterkennung: Google ML Kit, direkt auf dem Gerät.",
+  "version": "Version {v}",
+  "@version": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
+  "staleRefreshing": "Aktualisiere ältere Filmdaten …",
+  "zoomHint": "Zum Vergrößern mit zwei Fingern ziehen. Rahmen antippen.",
+  "chooseFormat": "Format wählen",
+  "searchFailed": "Suche fehlgeschlagen: {message}",
+  "@searchFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "unknown": "unbekannt"
+}

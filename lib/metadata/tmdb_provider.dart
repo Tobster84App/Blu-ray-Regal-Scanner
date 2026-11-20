@@ -10,7 +10,7 @@ import 'metadata_provider.dart';
 /// („API Read Access Token“, beginnt mit `eyJ`).
 class TmdbProvider implements MetadataProvider {
   TmdbProvider({required String Function() apiKey, http.Client? client})
-      : _apiKey = apiKey,
+      : _apiKey = apiKey, // ignore: prefer_initializing_formals
         _client = client ?? http.Client();
 
   final String Function() _apiKey;
