@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-java@v6.3.0
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
       - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -92,7 +92,7 @@ jobs:
         if: steps.fixture.outputs.present == 'true'
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
       - uses: subosito/flutter-action@v2.23.0
         if: steps.fixture.outputs.present == 'true'
         with:
