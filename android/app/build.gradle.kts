@@ -62,6 +62,10 @@ android {
             // (installierbar, aber nicht für den Play Store geeignet).
             signingConfig = if (hasReleaseKey) signingConfigs.getByName("release")
                             else signingConfigs.getByName("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
