@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../config/app_config.dart';
 import 'common.dart';
+import 'imprint_screen.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -35,6 +36,14 @@ class AboutScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text(l10n.textRecognitionInfo),
           const SizedBox(height: 24),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.gavel_outlined),
+            title: Text(l10n.imprint),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const ImprintScreen())),
+          ),
           TextButton(
             onPressed: () => showLicensePage(context: context, applicationName: appName),
             child: const Text('Open-Source-Lizenzen / Licenses'),

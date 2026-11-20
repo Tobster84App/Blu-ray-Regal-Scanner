@@ -102,5 +102,19 @@
   "zoomHint": "Pinch to zoom. Tap a frame.",
   "chooseFormat": "Choose format",
   "searchFailed": "Search failed: {message}",
-  "unknown": "unknown"
+  "unknown": "unknown",
+  "imprint": "Legal notice",
+  "imprintLegalBasis": "Information according to § 5 DDG (German Digital Services Act)",
+  "country": "Germany",
+  "contact": "Contact",
+  "email": "Email: {address}",
+  "imprintResponsibleTitle": "Responsible for content",
+  "imprintResponsible": "{name}, address as above",
+  "imprintDataTitle": "Movie data",
+  "imprintData": "Titles, overviews, images and other movie data come from The Movie Database (TMDB). We do not guarantee their accuracy.",
+  "imprintLinksTitle": "Liability for links",
+  "imprintLinks": "The app contains links to third-party services, such as YouTube for trailers. We have no influence on their content; the respective provider is responsible for it.",
+  "imprintDisputeTitle": "Consumer dispute resolution",
+  "imprintDispute": "We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.",
+  "imprintTranslationNote": "Translation for convenience. The German version is legally binding."
 }

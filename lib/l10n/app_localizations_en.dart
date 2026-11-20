@@ -367,4 +367,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknown => 'unknown';
+
+  @override
+  String get imprint => 'Legal notice';
+
+  @override
+  String get imprintLegalBasis =>
+      'Information according to § 5 DDG (German Digital Services Act)';
+
+  @override
+  String get country => 'Germany';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String email(String address) {
+    return 'Email: $address';
+  }
+
+  @override
+  String get imprintResponsibleTitle => 'Responsible for content';
+
+  @override
+  String imprintResponsible(String name) {
+    return '$name, address as above';
+  }
+
+  @override
+  String get imprintDataTitle => 'Movie data';
+
+  @override
+  String get imprintData =>
+      'Titles, overviews, images and other movie data come from The Movie Database (TMDB). We do not guarantee their accuracy.';
+
+  @override
+  String get imprintLinksTitle => 'Liability for links';
+
+  @override
+  String get imprintLinks =>
+      'The app contains links to third-party services, such as YouTube for trailers. We have no influence on their content; the respective provider is responsible for it.';
+
+  @override
+  String get imprintDisputeTitle => 'Consumer dispute resolution';
+
+  @override
+  String get imprintDispute =>
+      'We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.';
+
+  @override
+  String get imprintTranslationNote =>
+      'Translation for convenience. The German version is legally binding.';
 }

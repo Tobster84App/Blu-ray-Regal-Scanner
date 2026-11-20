@@ -9,6 +9,7 @@ import '../services/app_services.dart';
 import 'about_screen.dart';
 import 'common.dart';
 import 'detail_screen.dart';
+import 'imprint_screen.dart';
 import 'scan_screen.dart';
 import 'settings_screen.dart';
 
@@ -113,12 +114,17 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   onSelected: (v) => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => v == 'settings' ? const SettingsScreen() : const AboutScreen(),
+                      builder: (_) => switch (v) {
+                        'settings' => const SettingsScreen(),
+                        'imprint' => const ImprintScreen(),
+                        _ => const AboutScreen(),
+                      },
                     ),
                   ),
                   itemBuilder: (_) => [
                     PopupMenuItem(value: 'settings', child: Text(l10n.settings)),
                     PopupMenuItem(value: 'about', child: Text(l10n.about)),
+                    PopupMenuItem(value: 'imprint', child: Text(l10n.imprint)),
                   ],
                 ),
               ],

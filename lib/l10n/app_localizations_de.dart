@@ -369,4 +369,53 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get unknown => 'unbekannt';
+
+  @override
+  String get imprint => 'Impressum';
+
+  @override
+  String get imprintLegalBasis => 'Angaben gemäß § 5 DDG';
+
+  @override
+  String get country => 'Deutschland';
+
+  @override
+  String get contact => 'Kontakt';
+
+  @override
+  String email(String address) {
+    return 'E-Mail: $address';
+  }
+
+  @override
+  String get imprintResponsibleTitle => 'Verantwortlich für den Inhalt';
+
+  @override
+  String imprintResponsible(String name) {
+    return '$name, Anschrift wie oben';
+  }
+
+  @override
+  String get imprintDataTitle => 'Filmdaten';
+
+  @override
+  String get imprintData =>
+      'Titel, Inhaltsangaben, Bilder und weitere Filmdaten stammen von The Movie Database (TMDB). Für deren Richtigkeit übernehmen wir keine Gewähr.';
+
+  @override
+  String get imprintLinksTitle => 'Haftung für Links';
+
+  @override
+  String get imprintLinks =>
+      'Die App enthält Links zu Angeboten Dritter, etwa YouTube für Trailer. Auf deren Inhalte haben wir keinen Einfluss; dafür ist der jeweilige Anbieter verantwortlich.';
+
+  @override
+  String get imprintDisputeTitle => 'Verbraucherstreitbeilegung';
+
+  @override
+  String get imprintDispute =>
+      'Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.';
+
+  @override
+  String get imprintTranslationNote => '';
 }

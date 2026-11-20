@@ -258,5 +258,33 @@
       }
     }
   },
-  "unknown": "unbekannt"
+  "unknown": "unbekannt",
+  "imprint": "Impressum",
+  "imprintLegalBasis": "Angaben gemäß § 5 DDG",
+  "country": "Deutschland",
+  "contact": "Kontakt",
+  "email": "E-Mail: {address}",
+  "@email": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "imprintResponsibleTitle": "Verantwortlich für den Inhalt",
+  "imprintResponsible": "{name}, Anschrift wie oben",
+  "@imprintResponsible": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imprintDataTitle": "Filmdaten",
+  "imprintData": "Titel, Inhaltsangaben, Bilder und weitere Filmdaten stammen von The Movie Database (TMDB). Für deren Richtigkeit übernehmen wir keine Gewähr.",
+  "imprintLinksTitle": "Haftung für Links",
+  "imprintLinks": "Die App enthält Links zu Angeboten Dritter, etwa YouTube für Trailer. Auf deren Inhalte haben wir keinen Einfluss; dafür ist der jeweilige Anbieter verantwortlich.",
+  "imprintDisputeTitle": "Verbraucherstreitbeilegung",
+  "imprintDispute": "Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.",
+  "imprintTranslationNote": ""
 }

@@ -715,6 +715,90 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'unbekannt'**
   String get unknown;
+
+  /// No description provided for @imprint.
+  ///
+  /// In de, this message translates to:
+  /// **'Impressum'**
+  String get imprint;
+
+  /// No description provided for @imprintLegalBasis.
+  ///
+  /// In de, this message translates to:
+  /// **'Angaben gemäß § 5 DDG'**
+  String get imprintLegalBasis;
+
+  /// No description provided for @country.
+  ///
+  /// In de, this message translates to:
+  /// **'Deutschland'**
+  String get country;
+
+  /// No description provided for @contact.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt'**
+  String get contact;
+
+  /// No description provided for @email.
+  ///
+  /// In de, this message translates to:
+  /// **'E-Mail: {address}'**
+  String email(String address);
+
+  /// No description provided for @imprintResponsibleTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Verantwortlich für den Inhalt'**
+  String get imprintResponsibleTitle;
+
+  /// No description provided for @imprintResponsible.
+  ///
+  /// In de, this message translates to:
+  /// **'{name}, Anschrift wie oben'**
+  String imprintResponsible(String name);
+
+  /// No description provided for @imprintDataTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Filmdaten'**
+  String get imprintDataTitle;
+
+  /// No description provided for @imprintData.
+  ///
+  /// In de, this message translates to:
+  /// **'Titel, Inhaltsangaben, Bilder und weitere Filmdaten stammen von The Movie Database (TMDB). Für deren Richtigkeit übernehmen wir keine Gewähr.'**
+  String get imprintData;
+
+  /// No description provided for @imprintLinksTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Haftung für Links'**
+  String get imprintLinksTitle;
+
+  /// No description provided for @imprintLinks.
+  ///
+  /// In de, this message translates to:
+  /// **'Die App enthält Links zu Angeboten Dritter, etwa YouTube für Trailer. Auf deren Inhalte haben wir keinen Einfluss; dafür ist der jeweilige Anbieter verantwortlich.'**
+  String get imprintLinks;
+
+  /// No description provided for @imprintDisputeTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbraucherstreitbeilegung'**
+  String get imprintDisputeTitle;
+
+  /// No description provided for @imprintDispute.
+  ///
+  /// In de, this message translates to:
+  /// **'Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.'**
+  String get imprintDispute;
+
+  /// No description provided for @imprintTranslationNote.
+  ///
+  /// In de, this message translates to:
+  /// **''**
+  String get imprintTranslationNote;
 }
 
 class _AppLocalizationsDelegate

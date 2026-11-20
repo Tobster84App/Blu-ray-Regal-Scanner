@@ -17,6 +17,8 @@ Tobias Kern – programmiert nicht selbst, Windows-PC + Android-Handy, kein Mac.
 - Datenbank drift (SQLite), generierte Dateien (`*.g.dart`, `lib/l10n/app_localizations*.dart`) sind eingecheckt.
 - Netzwerk dieser Cloud-Umgebung: dl.google.com, api.themoviedb.org, developers.google.com gesperrt → APK-Build und Emulator nur in GitHub Actions; hier nur `flutter analyze`/`flutter test`.
 
+- Impressum in der App (`lib/ui/imprint_screen.dart`, Angaben in `lib/config/legal_info.dart`): Anbieter Tobias Kern. KernDigit-Logo (Konzept 4, aus Drive „KernDigit/Logos“, freigestellt als `assets/kerndigit_logo*.png`) **nur im Impressum**. KernDigit ist kein angemeldetes Gewerbe → nur als Logo, nicht als Anbietername.
+
 ## Erkennung (lib/recognition)
 ML Kit Latin auf Original + ±90° gedreht (`ocr_service.dart`, Rückrechnung `mapFromRotated`) → Duplikate raus, senkrechte Zeilen nach x zu Hüllen gruppieren (`spine_grouper.dart`) → Sperrliste (`blocklist.dart`; Studios nur, wenn ganze Zeile Studio) → Format (`format_detector.dart`) → TMDB `/search/multi` mit Varianten (`query_builder.dart`) → Bewertung `titleCoverage * (0.75 + 0.25 * spineCoverage)` gegen den ganzen Hüllentext (`matcher.dart`). Grün ≥ 0,85 und Abstand ≥ 0,05 zum Zweitbesten; gelb ≥ 0,5; grau = am Rand angeschnitten.
 Messung: `integration_test/ocr_eval_test.dart` im Emulator (CI-Job ocr-eval) mit `test/fixtures/shelf_01.jpg`, Erwartung in `test/fixtures/shelf_01_expected.dart`; Bericht + Rohzeilen (`ocr_lines.json`) als Artefakt – Rohzeilen zum Nachjustieren in Unit-Tests verwenden.
