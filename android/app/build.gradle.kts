@@ -62,10 +62,11 @@ android {
             // (installierbar, aber nicht für den Play Store geeignet).
             signingConfig = if (hasReleaseKey) signingConfigs.getByName("release")
                             else signingConfigs.getByName("debug")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
+            // Code-Verkleinerung (R8) aus: R8 benennt Klassen um, die ML Kit
+            // zur Laufzeit per Namen sucht -> Absturz bei der Texterkennung
+            // (NullPointerException, gesehen 21.11.2026).
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

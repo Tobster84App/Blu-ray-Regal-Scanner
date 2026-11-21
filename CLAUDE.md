@@ -17,6 +17,7 @@ Tobias Kern – programmiert nicht selbst, Windows-PC + Android-Handy, kein Mac.
 - Datenbank drift (SQLite), generierte Dateien (`*.g.dart`, `lib/l10n/app_localizations*.dart`) sind eingecheckt.
 - Netzwerk dieser Cloud-Umgebung: dl.google.com, api.themoviedb.org, developers.google.com gesperrt → APK-Build und Emulator nur in GitHub Actions; hier nur `flutter analyze`/`flutter test`.
 
+- Release-APK ohne R8/Minify (`isMinifyEnabled = false`): mit R8 stürzte ML Kit ab (NPE, 21.11.2026). Nicht wieder einschalten ohne Test auf Gerät.
 - Impressum in der App (`lib/ui/imprint_screen.dart`, Angaben in `lib/config/legal_info.dart`): Anbieter Tobias Kern. KernDigit-Logo (Konzept 4, aus Drive „KernDigit/Logos“, freigestellt als `assets/kerndigit_logo*.png`) **nur im Impressum**. KernDigit ist kein angemeldetes Gewerbe → nur als Logo, nicht als Anbietername.
 
 ## Erkennung (lib/recognition)
