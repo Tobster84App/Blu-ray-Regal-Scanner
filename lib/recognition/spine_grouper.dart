@@ -118,6 +118,25 @@ List<Spine> groupSpines(
     clusters.add([e]);
   }
 
+  // Reine Logo-/Nummern-Streifen (z. B. nur „Blu-ray Disc“) der nächsten
+  // Hülle mit Text zuschlagen, wenn sie nah genug liegt – sonst verwerfen.
+  bool hasText(List<({OcrLine line, double x})> c) =>
+      c.any((e) => cleanLine(e.line.text) != null);
+  double meanX(List<({OcrLine line, double x})> c) =>
+      c.map((e) => e.x).reduce((a, b) => a + b) / c.length;
+  final textClusters = clusters.where(hasText).toList();
+  for (final c in clusters.where((c) => !hasText(c))) {
+    if (textClusters.isEmpty) break;
+    final cx = meanX(c);
+    final nearest = textClusters.reduce((a, b) => (meanX(a) - cx).abs() < (meanX(b) - cx).abs() ? a : b);
+    final th = [...c, ...nearest].map((e) => e.line.thickness).reduce(math.max);
+    if ((meanX(nearest) - cx).abs() <= th * 1.2) nearest.addAll(c);
+  }
+  clusters
+    ..clear()
+    ..addAll(textClusters);
+  if (clusters.isEmpty) return const [];
+
   final groups = [for (final c in clusters) c.map((e) => e.line).toList()];
   final tilts = [
     for (final g in groups)

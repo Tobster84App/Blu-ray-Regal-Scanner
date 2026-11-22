@@ -46,14 +46,13 @@ void main() {
       v('XKCD QWERTZ', 500),
     ], imageWidth: 1000, imageHeight: 800);
     final results = await SpineMatcher(provider).matchAll(spines, language: 'de-DE');
-    expect(results.length, 5);
+    expect(results.length, 4); // reiner Studio-Streifen „LIONSGATE“ wird verworfen
     expect(results[0].best!.id, '1');
     expect(results[0].format, DiscFormat.uhd);
     // Schauspielername macht > 55 % der Buchstaben aus -> nur gelb (bewusst).
     expect(results[0].status, MatchStatus.yellow);
     expect(results[1].best!.id, '3');
-    expect(results[2].status, MatchStatus.red); // nur Studio
-    expect(results[3].best!.id, "9"); // "J0KER" -> Ziffer-Korrektur -> Joker
-    expect(results[4].status, MatchStatus.red);
+    expect(results[2].best!.id, "9"); // "J0KER" -> Ziffer-Korrektur -> Joker
+    expect(results[3].status, MatchStatus.red);
   });
 }
