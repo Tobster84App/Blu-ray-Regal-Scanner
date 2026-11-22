@@ -114,14 +114,18 @@ jobs:
     name: Erkennung auf Referenzfoto messen (Emulator)
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7.0.1
-      - name: Testfoto vorhanden?
+      - name: Testfotos vorhanden?
         id: fixture
         run: |
-          if [ -f test/fixtures/shelf_01.jpg ]; then echo "present=true" >> "$GITHUB_OUTPUT";
-          else echo "present=false" >> "$GITHUB_OUTPUT"; echo "Kein test/fixtures/shelf_01.jpg – übersprungen."; fi
+          LIST=$(cd test/fixtures 2>/dev/null && ls *.jpg 2>/dev/null | paste -sd, -)
+          if [ -n "$LIST" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"; echo "list=$LIST" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"; echo "Keine Testfotos – übersprungen."
+          fi
       - uses: actions/setup-java@v6.3.0
         if: steps.fixture.outputs.present == 'true'
         with:
@@ -139,16 +143,15 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Foto einbetten
+      - run: flutter pub get
         if: steps.fixture.outputs.present == 'true'
-        run: |
-          python3 tool/embed_fixture.py
-          flutter pub get
       - name: Emulator-Test
         if: steps.fixture.outputs.present == 'true'
         uses: reactivecircus/android-emulator-runner@v2.38.0
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          FIXTURE_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/test/fixtures
+          FIXTURES: ${{ steps.fixture.outputs.list }}
         with:
           api-level: 34
           arch: x86_64
@@ -157,7 +160,7 @@ jobs:
           disk-size: 6000M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/ocr_eval_test.dart --dart-define=TMDB_API_KEY="$TMDB_API_KEY"
+          script: flutter drive --profile --driver=test_driver/integration_test.dart --target=integration_test/ocr_eval_test.dart --dart-define=TMDB_API_KEY="$TMDB_API_KEY" --dart-define=FIXTURE_BASE_URL="$FIXTURE_BASE_URL" --dart-define=FIXTURES="$FIXTURES"
       - name: Bericht anzeigen
         if: always() && steps.fixture.outputs.present == 'true'
         run: |

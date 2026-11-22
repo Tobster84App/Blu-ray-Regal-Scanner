@@ -53,5 +53,3 @@ app.*.map.json
 android/key.properties
 dart_defines.json
 .env
-# Wird im CI aus test/fixtures erzeugt
-integration_test/fixture_data.g.dart.real
