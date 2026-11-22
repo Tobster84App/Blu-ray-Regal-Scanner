@@ -80,7 +80,19 @@ class SpineMatcher {
         error = '$e';
       }
     }
-    final ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText);
+    var ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText);
+    if (ranked.isEmpty || ranked.first.score < cfg.yellowThreshold) {
+      // Nichts Brauchbares: Ersatz-Suchen gegen Lesefehler.
+      for (final q in buildFallbackQueries(spine.cleanedLines)) {
+        if (queries.contains(q)) continue;
+        try {
+          hits.addAll(await provider.search(q, language: language));
+        } on Exception {
+          // ignorieren
+        }
+      }
+      ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText);
+    }
     return SpineResult(
       box: spine.box,
         polygon: spine.polygon,

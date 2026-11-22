@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @ocrPass.
   ///
   /// In de, this message translates to:
-  /// **'Texterkennung {n} von 3 …'**
+  /// **'Texterkennung {n} von 2 …'**
   String ocrPass(int n);
 
   /// No description provided for @searchingTitles.

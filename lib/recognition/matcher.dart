@@ -38,17 +38,51 @@ double scoreTitle(String title, String spineText) {
 
 double _tokenScore(List<String> t, List<String> s) {
   final usedS = List<bool>.filled(s.length, false);
-  var tWeight = 0.0, tMatched = 0.0;
-  for (final tt in t) {
-    final w = tokenWeight(tt);
-    tWeight += w;
+  final usedT = List<bool>.filled(t.length, false);
+  for (var j = 0; j < t.length; j++) {
     for (var i = 0; i < s.length; i++) {
-      if (!usedS[i] && tokensMatch(tt, s[i])) {
+      if (!usedS[i] && tokensMatch(t[j], s[i])) {
         usedS[i] = true;
-        tMatched += w;
+        usedT[j] = true;
         break;
       }
     }
+  }
+  // Zusammengeklebte Wörter: „zackisnyders“ = „zack“ + „snyders“,
+  // „ungeonsdragons“ ≈ „dungeons“ + „dragons“.
+  for (var j = 0; j < t.length; j++) {
+    for (var len = 3; len >= 2; len--) {
+      if (j + len > t.length) continue;
+      if (usedT.sublist(j, j + len).any((u) => u)) continue;
+      final glued = t.sublist(j, j + len).join();
+      for (var i = 0; i < s.length; i++) {
+        if (!usedS[i] && s[i].length >= 6 && tokensMatch(glued, s[i])) {
+          usedS[i] = true;
+          for (var k = j; k < j + len; k++) {
+            usedT[k] = true;
+          }
+          break;
+        }
+      }
+    }
+  }
+  // Umgekehrt: ein Titelwort, das auf der Hülle getrennt gelesen wurde.
+  for (var j = 0; j < t.length; j++) {
+    if (usedT[j] || t[j].length < 6) continue;
+    for (var i = 0; i + 1 < s.length; i++) {
+      if (usedS[i] || usedS[i + 1]) continue;
+      if (tokensMatch(t[j], s[i] + s[i + 1])) {
+        usedS[i] = usedS[i + 1] = true;
+        usedT[j] = true;
+        break;
+      }
+    }
+  }
+  var tWeight = 0.0, tMatched = 0.0;
+  for (var j = 0; j < t.length; j++) {
+    final w = tokenWeight(t[j]);
+    tWeight += w;
+    if (usedT[j]) tMatched += w;
   }
   var sWeight = 0.0, sMatched = 0.0;
   for (var i = 0; i < s.length; i++) {

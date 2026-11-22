@@ -22,8 +22,8 @@ class RecognitionConfig {
     this.minMargin = 0.05,
     this.edgeMarginFraction = 0.015,
     this.maxQueriesPerSpine = 6,
-    this.minLineConfidence = 0.4,
-    this.spineGapFactor = 0.7,
+    this.minLineConfidence = 0.25,
+    this.spineGapFactor = 0.55,
   });
 
   /// Ab diesem Wert ist ein Treffer „sicher“ (grün).

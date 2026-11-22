@@ -74,9 +74,8 @@ class _ScanScreenState extends State<ScanScreen> {
         if (!mounted) return;
         setState(() => _progress = switch (step) {
               'prepare' => l10n.preparingImage,
-              'none' => l10n.ocrPass(1),
-              'cw90' => l10n.ocrPass(2),
-              _ => l10n.ocrPass(3),
+              'ocr' => l10n.ocrPass(1),
+              _ => l10n.ocrPass(2),
             });
       });
       final cfg = _services.settings.recognitionConfig;

@@ -37,10 +37,10 @@ void main() {
         OcrLine(text: t, box: Box(x, 100, x + 30, 700), rotation: ScanRotation.ccw90);
     final spines = groupSpines([
       v('JOHN WICK', 100),
-      OcrLine(text: 'KEANU REEVES', box: const Box(133, 400, 145, 600), rotation: ScanRotation.ccw90),
+      OcrLine(text: 'KEANU REEVES', box: const Box(128, 400, 140, 600), rotation: ScanRotation.ccw90),
       OcrLine(text: '4K ULTRA HD', box: const Box(100, 20, 130, 40), rotation: ScanRotation.none),
       v('JOHN WICK', 200),
-      OcrLine(text: 'KAPITEL 3', box: const Box(233, 300, 248, 500), rotation: ScanRotation.ccw90),
+      OcrLine(text: 'KAPITEL 3', box: const Box(225, 300, 240, 500), rotation: ScanRotation.ccw90),
       v('LIONSGATE', 300),
       v('J0KER', 400),
       v('XKCD QWERTZ', 500),

@@ -67,6 +67,25 @@ final _studioRe = RegExp(
   [...studioTerms, ...studioFillers].map(_pattern).join('|'),
 );
 final _onlyDigitsOrCodes = RegExp(r'^[\d\s]*$');
+final _hasDigit = RegExp(r'\d');
+final _hasLetter = RegExp(r'[a-z]');
+
+/// Formatlogo mit OCR-Fehlern? („UTRAHD“, „JLTRAHD“, „Blusay“, „4KULTRAHD“ …)
+bool isFormatToken(String token) {
+  var t = token;
+  if (t.length > 4 && (t.startsWith('4k') || t.startsWith('ak'))) t = t.substring(2);
+  if (t == '4k' || t == 'ak' || t == 'uhd' || t == 'dvd') return true;
+  if (t.length >= 5 && t.length <= 9 && levenshtein(t, 'ultrahd') <= 2) return true;
+  if (t.startsWith('bl') && t.length >= 4 && t.length <= 7 && levenshtein(t, 'bluray') <= 2) {
+    return true;
+  }
+  return false;
+}
+
+/// Artikel-/Bestellnummern wie „D087402“, „OI60304“, „UFI2329“.
+bool isCodeToken(String t) =>
+    t.length >= 4 && _hasDigit.hasMatch(t) && _hasLetter.hasMatch(t) &&
+    _hasDigit.allMatches(t).length >= t.length / 2;
 final _letters = RegExp(r'[a-z]');
 
 /// Bereinigt eine OCR-Zeile. Gibt `null` zurück, wenn nichts Sinnvolles
@@ -87,6 +106,11 @@ String? cleanLine(String raw) {
 
   // Lange Ziffernfolgen (Artikel-/Bestellnummern, EAN) entfernen.
   s = s.replaceAll(RegExp(r'(?<![a-z0-9])\d{5,}(?![a-z0-9])'), ' ');
+  // Formatlogos mit Lesefehlern und Bestellnummern wortweise entfernen.
+  s = s
+      .split(' ')
+      .where((t) => t.isNotEmpty && !isFormatToken(t) && !isCodeToken(t))
+      .join(' ');
   s = s.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   if (_letters.allMatches(s).length < 2) return null;

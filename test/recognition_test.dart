@@ -250,7 +250,7 @@ void main() {
     test('drei Hüllen nebeneinander, eine mit zwei Zeilen', () {
       final spines = groupSpines([
         v('JOHN WICK', 100, 30),
-        v('KEANU REEVES', 135, 15, top: 300, h: 200), // gleiche Hülle
+        v('KEANU REEVES', 128, 15, top: 300, h: 200), // gleiche Hülle
         v('JOKER', 200, 30),
         v('DUNE', 300, 30),
         hz('4K', 102, 25, 20),

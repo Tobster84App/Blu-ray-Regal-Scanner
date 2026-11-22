@@ -116,7 +116,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String ocrPass(int n) {
-    return 'Text recognition $n of 3 …';
+    return 'Text recognition $n of 2 …';
   }
 
   @override
