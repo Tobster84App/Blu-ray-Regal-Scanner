@@ -6,4 +6,4 @@ const List<String> providerAddress = [
   'Leharweg 17',
   '74193 Schwaigern',
 ];
-const String providerEmail = 'info@rate-my-throne.com';
+const String providerEmail = 'kontakt@kerndigit.com';
