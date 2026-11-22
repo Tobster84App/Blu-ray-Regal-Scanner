@@ -665,7 +665,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutText.
   ///
   /// In de, this message translates to:
-  /// **'Erfasse deine Film- und Seriensammlung, indem du dein Regal fotografierst. Alle Daten bleiben auf deinem Gerät. Keine Konten, keine Werbung, kein Tracking.'**
+  /// **'Erfasse deine Film- und Seriensammlung, indem du dein Regal fotografierst. Alle Daten bleiben auf deinem Gerät. Keine Konten, keine Werbung. Welche Dienste genutzt werden, steht unter „Datenschutz“.'**
   String get aboutText;
 
   /// No description provided for @dataSources.
@@ -799,6 +799,72 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **''**
   String get imprintTranslationNote;
+
+  /// No description provided for @privacy.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenschutz'**
+  String get privacy;
+
+  /// No description provided for @privacyIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Sammlung, Fotos und Einstellungen werden nur auf diesem Gerät gespeichert. Es gibt keine Konten, keine Werbung und keine Cloud. Folgende Dienste werden genutzt:'**
+  String get privacyIntro;
+
+  /// No description provided for @privacyMlkitTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Texterkennung (Google ML Kit)'**
+  String get privacyMlkitTitle;
+
+  /// No description provided for @privacyMlkit.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Erkennung der Schrift auf deinen Fotos läuft vollständig auf dem Gerät; Fotos und erkannter Text werden nicht an Google gesendet. ML Kit überträgt jedoch Nutzungs- und Diagnosedaten an Google: Gerätehersteller und -modell, Android-Version, Name und Version der App, Leistungswerte (z. B. Dauer) sowie eine Kennung pro Installation, die laut Google nicht dazu gedacht ist, dich oder dein Gerät eindeutig zu identifizieren. Google nutzt diese Daten, um ML Kit zu verbessern und Missbrauch zu erkennen. Abschalten lässt sich das nicht.'**
+  String get privacyMlkit;
+
+  /// No description provided for @privacyTmdbTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Filmdaten (TMDB)'**
+  String get privacyTmdbTitle;
+
+  /// No description provided for @privacyTmdb.
+  ///
+  /// In de, this message translates to:
+  /// **'Zur Titelsuche werden die erkannten bzw. eingegebenen Suchbegriffe an The Movie Database (TMDB) gesendet; Poster und Bilder werden von TMDB geladen. Dabei erhält TMDB technisch bedingt deine IP-Adresse. Es gilt die Datenschutzerklärung von TMDB.'**
+  String get privacyTmdb;
+
+  /// No description provided for @privacyYoutubeTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Trailer (YouTube)'**
+  String get privacyYoutubeTitle;
+
+  /// No description provided for @privacyYoutube.
+  ///
+  /// In de, this message translates to:
+  /// **'„Trailer ansehen“ öffnet YouTube in der YouTube-App oder im Browser. Erst dann gelten die Datenschutzbestimmungen von Google/YouTube.'**
+  String get privacyYoutube;
+
+  /// No description provided for @privacyKeyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'API-Schlüssel'**
+  String get privacyKeyTitle;
+
+  /// No description provided for @privacyKey.
+  ///
+  /// In de, this message translates to:
+  /// **'Ein selbst eingetragener TMDB-Schlüssel wird verschlüsselt auf dem Gerät gespeichert und nur an TMDB gesendet.'**
+  String get privacyKey;
+
+  /// No description provided for @privacyLinks.
+  ///
+  /// In de, this message translates to:
+  /// **'Weitere Informationen'**
+  String get privacyLinks;
 }
 
 class _AppLocalizationsDelegate

@@ -337,7 +337,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutText =>
-      'Catalog your movie and TV collection by photographing your shelf. All data stays on your device. No accounts, no ads, no tracking.';
+      'Catalog your movie and TV collection by photographing your shelf. All data stays on your device. No accounts, no ads. See “Privacy” for the services used.';
 
   @override
   String get dataSources => 'Data sources';
@@ -418,4 +418,42 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get imprintTranslationNote =>
       'Translation for convenience. The German version is legally binding.';
+
+  @override
+  String get privacy => 'Privacy';
+
+  @override
+  String get privacyIntro =>
+      'Your collection, photos and settings are stored only on this device. There are no accounts, no ads and no cloud. The following services are used:';
+
+  @override
+  String get privacyMlkitTitle => 'Text recognition (Google ML Kit)';
+
+  @override
+  String get privacyMlkit =>
+      'Recognizing the text on your photos happens entirely on the device; photos and recognized text are not sent to Google. However, ML Kit sends usage and diagnostic data to Google: device manufacturer and model, Android version, app name and version, performance metrics (e.g. duration) and a per-installation identifier that, according to Google, is not intended to uniquely identify you or your device. Google uses this data to improve ML Kit and to detect abuse. This cannot be turned off.';
+
+  @override
+  String get privacyTmdbTitle => 'Movie data (TMDB)';
+
+  @override
+  String get privacyTmdb =>
+      'To search for titles, the recognized or entered search terms are sent to The Movie Database (TMDB); posters and images are loaded from TMDB. In doing so, TMDB technically receives your IP address. TMDB\'s privacy policy applies.';
+
+  @override
+  String get privacyYoutubeTitle => 'Trailers (YouTube)';
+
+  @override
+  String get privacyYoutube =>
+      '“Watch trailer” opens YouTube in the YouTube app or browser. Only then do Google/YouTube\'s privacy terms apply.';
+
+  @override
+  String get privacyKeyTitle => 'API key';
+
+  @override
+  String get privacyKey =>
+      'A TMDB key you enter yourself is stored encrypted on the device and only sent to TMDB.';
+
+  @override
+  String get privacyLinks => 'More information';
 }

@@ -3,7 +3,7 @@
 Stand: 20.11.2026. Kurz halten, bei wichtigen Änderungen aktualisieren.
 
 ## Ziel
-Flutter-App (Android zuerst, iOS später): Regalfoto mit Hüllenrücken → Titel erkennen → farbige Rahmen auf dem Foto → bestätigte Titel in lokale Filmdatenbank (Liste + Detailseite mit TMDB-Daten). Kostenlos, keine Werbung, kein Tracking, keine Konten, Daten nur auf dem Gerät. Version 1 nicht-kommerziell.
+Flutter-App (Android zuerst, iOS später): Regalfoto mit Hüllenrücken → Titel erkennen → farbige Rahmen auf dem Foto → bestätigte Titel in lokale Filmdatenbank (Liste + Detailseite mit TMDB-Daten). Kostenlos, keine Werbung, kein eigenes Tracking, keine Konten, Daten nur auf dem Gerät. Version 1 nicht-kommerziell.
 
 ## Nutzer
 Tobias Kern – programmiert nicht selbst, Windows-PC + Android-Handy, kein Mac. Erklärungen auf Deutsch, Schritt für Schritt. Rückfragen nummeriert (F1, F2 …). Bei Architekturentscheidungen erst fragen.
@@ -18,6 +18,7 @@ Tobias Kern – programmiert nicht selbst, Windows-PC + Android-Handy, kein Mac.
 - Cloud-Umgebung „Tobias Apps (Scanner + Throne)“: TMDB (Schlüssel per Proxy für api.themoviedb.org hinterlegt), developers.google.com, storage.googleapis.com erlaubt; Setup-Skript installiert Flutter. dl.google.com gesperrt → APK-Build und Emulator nur in GitHub Actions. Live-Test der Treffersuche: `TMDB_API_KEY=eyJproxy dart run tool/live_match.dart` (Proxy ersetzt den Platzhalter).
 
 - Release-APK ohne R8/Minify (`isMinifyEnabled = false`): mit R8 stürzte ML Kit ab (NPE, 21.11.2026). Nicht wieder einschalten ohne Test auf Gerät.
+- ML Kit sendet Nutzungs-/Diagnosedaten an Google (Gerät, App-Version, Installations-ID; keine Fotos/Texte), nicht abschaltbar. Entscheidung 22.11.2026: offenlegen → `lib/ui/privacy_screen.dart`. Nicht mit „kein Tracking“ werben.
 - Impressum in der App (`lib/ui/imprint_screen.dart`, Angaben in `lib/config/legal_info.dart`): Anbieter Tobias Kern. KernDigit-Logo (Konzept 4, aus Drive „KernDigit/Logos“, freigestellt als `assets/kerndigit_logo*.png`) **nur im Impressum**. KernDigit ist kein angemeldetes Gewerbe → nur als Logo, nicht als Anbietername.
 
 ## Erkennung (lib/recognition)
@@ -29,4 +30,3 @@ Messung: `integration_test/ocr_eval_test.dart` im Emulator (CI-Job ocr-eval) mit
 
 ## Offen
 - TMDB-Logo als Asset fehlt (themoviedb.org hier gesperrt) – `assets/tmdb_logo.png` ergänzen und in pubspec eintragen.
-- ML-Kit-Datenübertragung an Google (Telemetrie) noch nicht geprüft (Doku-Seite hier gesperrt).

@@ -2,10 +2,10 @@
 
 Android-App (später auch iOS), die auf einem Foto deines Regals die Titel der
 Blu-ray-/UHD-/DVD-Hüllen erkennt und sie in eine lokale Filmdatenbank
-übernimmt. Kostenlos, ohne Werbung, ohne Tracking, ohne Konto. Alle Daten
+übernimmt. Kostenlos, ohne Werbung, ohne Konto. Alle Daten
 bleiben auf dem Gerät.
 
-* Texterkennung: Google ML Kit, offline auf dem Gerät
+* Texterkennung: Google ML Kit auf dem Gerät (Fotos bleiben lokal; ML Kit sendet Nutzungs-/Diagnosedaten an Google – siehe Datenschutz-Seite in der App)
 * Filmdaten: [TMDB](https://www.themoviedb.org/) – *This product uses the TMDB API but is not endorsed or certified by TMDB.*
 * App-Name: Platzhalter `APP_NAME` in `lib/config/app_config.dart` (nur dort ändern)
 * Package-ID: `de.planmycinema.discscanner`

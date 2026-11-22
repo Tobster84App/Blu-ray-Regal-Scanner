@@ -338,7 +338,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutText =>
-      'Erfasse deine Film- und Seriensammlung, indem du dein Regal fotografierst. Alle Daten bleiben auf deinem Gerät. Keine Konten, keine Werbung, kein Tracking.';
+      'Erfasse deine Film- und Seriensammlung, indem du dein Regal fotografierst. Alle Daten bleiben auf deinem Gerät. Keine Konten, keine Werbung. Welche Dienste genutzt werden, steht unter „Datenschutz“.';
 
   @override
   String get dataSources => 'Datenquellen';
@@ -418,4 +418,42 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get imprintTranslationNote => '';
+
+  @override
+  String get privacy => 'Datenschutz';
+
+  @override
+  String get privacyIntro =>
+      'Deine Sammlung, Fotos und Einstellungen werden nur auf diesem Gerät gespeichert. Es gibt keine Konten, keine Werbung und keine Cloud. Folgende Dienste werden genutzt:';
+
+  @override
+  String get privacyMlkitTitle => 'Texterkennung (Google ML Kit)';
+
+  @override
+  String get privacyMlkit =>
+      'Die Erkennung der Schrift auf deinen Fotos läuft vollständig auf dem Gerät; Fotos und erkannter Text werden nicht an Google gesendet. ML Kit überträgt jedoch Nutzungs- und Diagnosedaten an Google: Gerätehersteller und -modell, Android-Version, Name und Version der App, Leistungswerte (z. B. Dauer) sowie eine Kennung pro Installation, die laut Google nicht dazu gedacht ist, dich oder dein Gerät eindeutig zu identifizieren. Google nutzt diese Daten, um ML Kit zu verbessern und Missbrauch zu erkennen. Abschalten lässt sich das nicht.';
+
+  @override
+  String get privacyTmdbTitle => 'Filmdaten (TMDB)';
+
+  @override
+  String get privacyTmdb =>
+      'Zur Titelsuche werden die erkannten bzw. eingegebenen Suchbegriffe an The Movie Database (TMDB) gesendet; Poster und Bilder werden von TMDB geladen. Dabei erhält TMDB technisch bedingt deine IP-Adresse. Es gilt die Datenschutzerklärung von TMDB.';
+
+  @override
+  String get privacyYoutubeTitle => 'Trailer (YouTube)';
+
+  @override
+  String get privacyYoutube =>
+      '„Trailer ansehen“ öffnet YouTube in der YouTube-App oder im Browser. Erst dann gelten die Datenschutzbestimmungen von Google/YouTube.';
+
+  @override
+  String get privacyKeyTitle => 'API-Schlüssel';
+
+  @override
+  String get privacyKey =>
+      'Ein selbst eingetragener TMDB-Schlüssel wird verschlüsselt auf dem Gerät gespeichert und nur an TMDB gesendet.';
+
+  @override
+  String get privacyLinks => 'Weitere Informationen';
 }

@@ -10,6 +10,7 @@ import 'about_screen.dart';
 import 'common.dart';
 import 'detail_screen.dart';
 import 'imprint_screen.dart';
+import 'privacy_screen.dart';
 import 'scan_screen.dart';
 import 'settings_screen.dart';
 
@@ -117,6 +118,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                       builder: (_) => switch (v) {
                         'settings' => const SettingsScreen(),
                         'imprint' => const ImprintScreen(),
+                        'privacy' => const PrivacyScreen(),
                         _ => const AboutScreen(),
                       },
                     ),
@@ -124,6 +126,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   itemBuilder: (_) => [
                     PopupMenuItem(value: 'settings', child: Text(l10n.settings)),
                     PopupMenuItem(value: 'about', child: Text(l10n.about)),
+                    PopupMenuItem(value: 'privacy', child: Text(l10n.privacy)),
                     PopupMenuItem(value: 'imprint', child: Text(l10n.imprint)),
                   ],
                 ),

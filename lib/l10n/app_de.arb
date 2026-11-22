@@ -236,7 +236,7 @@
   "tmdbKeyHelp": "API-Schlüssel (v3) oder Lesezugriffstoken (v4). Wird verschlüsselt auf dem Gerät gespeichert.",
   "tmdbKeyFromBuild": "Ein Schlüssel aus dem Build ist vorhanden. Ein eigener ersetzt ihn.",
   "tmdbAttribution": "This product uses the TMDB API but is not endorsed or certified by TMDB.",
-  "aboutText": "Erfasse deine Film- und Seriensammlung, indem du dein Regal fotografierst. Alle Daten bleiben auf deinem Gerät. Keine Konten, keine Werbung, kein Tracking.",
+  "aboutText": "Erfasse deine Film- und Seriensammlung, indem du dein Regal fotografierst. Alle Daten bleiben auf deinem Gerät. Keine Konten, keine Werbung. Welche Dienste genutzt werden, steht unter „Datenschutz“.",
   "dataSources": "Datenquellen",
   "textRecognitionInfo": "Texterkennung: Google ML Kit, direkt auf dem Gerät.",
   "version": "Version {v}",
@@ -286,5 +286,16 @@
   "imprintLinks": "Die App enthält Links zu Angeboten Dritter, etwa YouTube für Trailer. Auf deren Inhalte haben wir keinen Einfluss; dafür ist der jeweilige Anbieter verantwortlich.",
   "imprintDisputeTitle": "Verbraucherstreitbeilegung",
   "imprintDispute": "Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.",
-  "imprintTranslationNote": ""
+  "imprintTranslationNote": "",
+  "privacy": "Datenschutz",
+  "privacyIntro": "Deine Sammlung, Fotos und Einstellungen werden nur auf diesem Gerät gespeichert. Es gibt keine Konten, keine Werbung und keine Cloud. Folgende Dienste werden genutzt:",
+  "privacyMlkitTitle": "Texterkennung (Google ML Kit)",
+  "privacyMlkit": "Die Erkennung der Schrift auf deinen Fotos läuft vollständig auf dem Gerät; Fotos und erkannter Text werden nicht an Google gesendet. ML Kit überträgt jedoch Nutzungs- und Diagnosedaten an Google: Gerätehersteller und -modell, Android-Version, Name und Version der App, Leistungswerte (z. B. Dauer) sowie eine Kennung pro Installation, die laut Google nicht dazu gedacht ist, dich oder dein Gerät eindeutig zu identifizieren. Google nutzt diese Daten, um ML Kit zu verbessern und Missbrauch zu erkennen. Abschalten lässt sich das nicht.",
+  "privacyTmdbTitle": "Filmdaten (TMDB)",
+  "privacyTmdb": "Zur Titelsuche werden die erkannten bzw. eingegebenen Suchbegriffe an The Movie Database (TMDB) gesendet; Poster und Bilder werden von TMDB geladen. Dabei erhält TMDB technisch bedingt deine IP-Adresse. Es gilt die Datenschutzerklärung von TMDB.",
+  "privacyYoutubeTitle": "Trailer (YouTube)",
+  "privacyYoutube": "„Trailer ansehen“ öffnet YouTube in der YouTube-App oder im Browser. Erst dann gelten die Datenschutzbestimmungen von Google/YouTube.",
+  "privacyKeyTitle": "API-Schlüssel",
+  "privacyKey": "Ein selbst eingetragener TMDB-Schlüssel wird verschlüsselt auf dem Gerät gespeichert und nur an TMDB gesendet.",
+  "privacyLinks": "Weitere Informationen"
 }
