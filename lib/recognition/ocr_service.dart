@@ -2,11 +2,13 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart' show decodeImageFromList;
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'blocklist.dart';
 import 'models.dart';
 
 class OcrResult {
@@ -26,24 +28,38 @@ class OcrResult {
 }
 
 /// Zeilen unter dieser Sicherheit werden einzeln nachgelesen.
-const double recheckBelowConfidence = 0.6;
-const int maxRechecks = 80;
+const double recheckBelowConfidence = 0.5;
+const int maxRechecks = 40;
+
+/// Ausschnitte werden auf diese Schrifthöhe verkleinert (spart Zeit).
+const double recheckTargetThickness = 56;
 
 class _Prepared {
-  _Prepared(this.width, this.height, this.path);
+  _Prepared(this.width, this.height, this.path, this.rotated);
   final int width, height;
   final String path;
+
+  /// Um ±90° gedrehte Kopien (temporär).
+  final Map<ScanRotation, String> rotated;
 }
 
-/// EXIF-Drehung anwenden und als JPEG speichern (Hintergrund-Isolate).
-Future<_Prepared> _prepare((Uint8List, String) args) async {
-  final (bytes, dir) = args;
+/// EXIF-Drehung anwenden, als JPEG speichern und ±90° gedrehte Kopien
+/// anlegen (Hintergrund-Isolate).
+Future<_Prepared> _prepare((Uint8List, String, String) args) async {
+  final (bytes, dir, tmp) = args;
   final decoded = img.decodeImage(bytes);
   if (decoded == null) throw Exception('Bild konnte nicht gelesen werden');
   final upright = img.bakeOrientation(decoded);
-  final path = p.join(dir, 'scan_${DateTime.now().microsecondsSinceEpoch}.jpg');
+  final stamp = DateTime.now().microsecondsSinceEpoch;
+  final path = p.join(dir, 'scan_$stamp.jpg');
   await File(path).writeAsBytes(img.encodeJpg(upright, quality: 95));
-  return _Prepared(upright.width, upright.height, path);
+  final rotated = <ScanRotation, String>{};
+  for (final (r, angle) in [(ScanRotation.cw90, 90), (ScanRotation.ccw90, -90)]) {
+    final rp = p.join(tmp, 'scan_${stamp}_${r.name}.jpg');
+    await File(rp).writeAsBytes(img.encodeJpg(img.copyRotate(upright, angle: angle), quality: 92));
+    rotated[r] = rp;
+  }
+  return _Prepared(upright.width, upright.height, path, rotated);
 }
 
 /// Ausschnitt einer Zeile für das Nachlesen.
@@ -53,13 +69,13 @@ class CropSpec {
 }
 
 /// Schneidet jede Zeile aus und dreht sie so, dass die Schrift waagerecht
-/// liegt – einmal in der von ML Kit angenommenen Leserichtung (a) und einmal
-/// um 180° gedreht (b). Gibt die Dateipfade zurück.
-Future<List<(String, String)>> _cropLines((String, List<List<double>>, String) args) async {
+/// liegt – entgegen der von ML Kit angenommenen Leserichtung (die ja zu
+/// einer unsicheren Lesung geführt hat). Gibt die Dateipfade zurück.
+Future<List<String>> _cropLines((String, List<List<double>>, String) args) async {
   final (path, specs, dir) = args;
   final image = img.decodeJpg(await File(path).readAsBytes());
   if (image == null) return const [];
-  final out = <(String, String)>[];
+  final out = <String>[];
   final stamp = DateTime.now().microsecondsSinceEpoch;
   for (var i = 0; i < specs.length; i++) {
     final c = specs[i]; // x0,y0,x1,y1,x2,y2,x3,y3
@@ -74,18 +90,21 @@ Future<List<(String, String)>> _cropLines((String, List<List<double>>, String) a
     final right = math.min(image.width.toDouble(), xs.reduce(math.max) + pad).ceil();
     final bottom = math.min(image.height.toDouble(), ys.reduce(math.max) + pad).ceil();
     if (right - left < 8 || bottom - top < 8) {
-      out.add(('', ''));
+      out.add('');
       continue;
     }
-    final crop = img.copyCrop(image, x: left, y: top, width: right - left, height: bottom - top);
-    // copyRotate dreht im Uhrzeigersinn; -angle legt die Schrift waagerecht.
-    final a = img.copyRotate(crop, angle: -angle, interpolation: img.Interpolation.linear);
-    final b = img.copyRotate(a, angle: 180);
-    final pa = p.join(dir, 'crop_${stamp}_${i}_a.jpg');
-    final pb = p.join(dir, 'crop_${stamp}_${i}_b.jpg');
-    await File(pa).writeAsBytes(img.encodeJpg(a, quality: 92));
+    var crop = img.copyCrop(image, x: left, y: top, width: right - left, height: bottom - top);
+    if (th > recheckTargetThickness * 1.3) {
+      final f = recheckTargetThickness / th;
+      crop = img.copyResize(crop, width: math.max(8, (crop.width * f).round()),
+          interpolation: img.Interpolation.average);
+    }
+    // copyRotate dreht im Uhrzeigersinn; 180-angle legt die Schrift
+    // waagerecht, aber umgekehrt zur bisherigen Leserichtung.
+    final b = img.copyRotate(crop, angle: 180 - angle, interpolation: img.Interpolation.linear);
+    final pb = p.join(dir, 'crop_${stamp}_$i.jpg');
     await File(pb).writeAsBytes(img.encodeJpg(b, quality: 92));
-    out.add((pa, pb));
+    out.add(pb);
   }
   return out;
 }
@@ -110,32 +129,46 @@ class OcrService {
     await scans.create(recursive: true);
     final tmp = await getTemporaryDirectory();
     onStep?.call('prepare');
-    final prepared = await compute(_prepare, (bytes, scans.path));
+    final prepared = await compute(_prepare, (bytes, scans.path, tmp.path));
     final w = prepared.width.toDouble(), h = prepared.height.toDouble();
 
-    onStep?.call('ocr');
-    final result = await _recognizer.processImage(InputImage.fromFilePath(prepared.path));
-    var lines = <OcrLine>[];
-    for (final block in result.blocks) {
-      for (final line in block.lines) {
-        final r = line.boundingBox;
-        final corners = line.cornerPoints.length == 4
-            ? [for (final c in line.cornerPoints) Pt(c.x.toDouble(), c.y.toDouble())]
-            : null;
-        lines.add(OcrLine(
-          text: line.text,
-          box: Box(r.left, r.top, r.right, r.bottom),
-          rotation: ScanRotation.none,
-          confidence: line.confidence,
-          corners: corners,
-        ));
+    // Drei Durchläufe: ML Kit findet in den gedrehten Bildern zusätzliche
+    // Zeilen (gemessen 22.11.2026), auch wenn es Schrift meist selbst dreht.
+    final lines = <OcrLine>[];
+    for (final rotation in ScanRotation.values) {
+      onStep?.call(rotation == ScanRotation.none ? 'ocr' : 'ocr2');
+      final path = rotation == ScanRotation.none ? prepared.path : prepared.rotated[rotation]!;
+      final result = await _recognizer.processImage(InputImage.fromFilePath(path));
+      for (final block in result.blocks) {
+        for (final line in block.lines) {
+          final r = line.boundingBox;
+          final corners = line.cornerPoints.length == 4
+              ? [
+                  for (final c in line.cornerPoints)
+                    mapPointFromRotated(Pt(c.x.toDouble(), c.y.toDouble()), rotation, w, h),
+                ]
+              : null;
+          lines.add(OcrLine(
+            text: line.text,
+            box: mapFromRotated(Box(r.left, r.top, r.right, r.bottom), rotation, w, h),
+            rotation: rotation,
+            confidence: line.confidence,
+            corners: corners,
+          ));
+        }
+      }
+      if (rotation != ScanRotation.none) {
+        await File(path).delete().catchError((_) => File(path));
       }
     }
 
-    // Unsichere Zeilen nachlesen.
+    // Unsichere Zeilen nachlesen (Logos und Nummern nicht).
     final candidates = [
       for (var i = 0; i < lines.length; i++)
-        if ((lines[i].confidence ?? 0) < recheckBelowConfidence) i,
+        if ((lines[i].confidence ?? 0) < recheckBelowConfidence &&
+            lines[i].isVertical &&
+            cleanLine(lines[i].text) != null)
+          i,
     ]..sort((a, b) => (lines[a].confidence ?? 0).compareTo(lines[b].confidence ?? 0));
     final chosen = candidates.take(maxRechecks).toList();
     if (chosen.isNotEmpty) {
@@ -145,26 +178,20 @@ class OcrService {
       ];
       final crops = await compute(_cropLines, (prepared.path, specs, tmp.path));
       for (var k = 0; k < chosen.length && k < crops.length; k++) {
-        final (pa, pb) = crops[k];
-        if (pa.isEmpty) continue;
+        final path = crops[k];
+        if (path.isEmpty) continue;
         final original = lines[chosen[k]];
-        var best = (text: original.text, conf: original.confidence ?? 0, flipped: false);
-        for (final (path, flipped) in [(pa, false), (pb, true)]) {
-          final read = await _readCrop(path);
-          if (read != null && read.conf > best.conf + 0.05) {
-            best = (text: read.text, conf: read.conf, flipped: flipped);
-          }
-          await File(path).delete().catchError((_) => File(path));
-        }
-        if (best.text != original.text) {
+        final read = await _readCrop(path);
+        await File(path).delete().catchError((_) => File(path));
+        if (read != null && read.conf > (original.confidence ?? 0) + 0.05) {
           // Umgedreht gelesen: Leserichtung der Eckpunkte umkehren.
           final c = original.corners;
           lines[chosen[k]] = OcrLine(
-            text: best.text,
+            text: read.text,
             box: original.box,
             rotation: original.rotation,
-            confidence: best.conf,
-            corners: best.flipped ? [c[2], c[3], c[0], c[1]] : c,
+            confidence: read.conf,
+            corners: [c[2], c[3], c[0], c[1]],
           );
         }
       }
@@ -172,17 +199,21 @@ class OcrService {
     return OcrResult(lines: lines, width: w, height: h, imagePath: prepared.path);
   }
 
-  /// Liest einen Ausschnitt; alle Zeilen von links nach rechts zusammengefügt.
+  /// Liest einen Ausschnitt. Es zählen nur Zeilen auf der Mittellinie des
+  /// Ausschnitts (dort liegt die nachzulesende Zeile), von links nach rechts.
   Future<({String text, double conf})?> _readCrop(String path) async {
     final r = await _recognizer.processImage(InputImage.fromFilePath(path));
-    final ls = [for (final b in r.blocks) ...b.lines]
-      ..sort((a, b) => a.boundingBox.left.compareTo(b.boundingBox.left));
+    final size = await decodeImageFromList(await File(path).readAsBytes());
+    final midY = size.height / 2;
+    final ls = [
+      for (final b in r.blocks)
+        for (final l in b.lines)
+          if (l.boundingBox.top <= midY && l.boundingBox.bottom >= midY) l,
+    ]..sort((a, b) => a.boundingBox.left.compareTo(b.boundingBox.left));
+    size.dispose();
     if (ls.isEmpty) return null;
-    // Nur die größte Zeile (die nachzulesende) und gleich hohe daneben.
-    final maxH = ls.map((l) => l.boundingBox.height).reduce(math.max);
-    final main = ls.where((l) => l.boundingBox.height >= maxH * 0.6).toList();
-    final text = main.map((l) => l.text).join(' ');
-    final confs = main.map((l) => l.confidence ?? 0).toList();
+    final text = ls.map((l) => l.text).join(' ');
+    final confs = ls.map((l) => l.confidence ?? 0).toList();
     final conf = confs.reduce((a, b) => a + b) / confs.length;
     return (text: text, conf: conf);
   }

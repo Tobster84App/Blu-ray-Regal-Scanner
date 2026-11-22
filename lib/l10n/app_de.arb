@@ -50,7 +50,7 @@
   "formatUhd": "4K UHD",
   "recognizing": "Erkenne Text …",
   "preparingImage": "Bereite Foto vor …",
-  "ocrPass": "Texterkennung {n} von 2 …",
+  "ocrPass": "Texterkennung {n} von 3 …",
   "@ocrPass": {
     "placeholders": {
       "n": {

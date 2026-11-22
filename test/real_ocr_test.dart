@@ -39,6 +39,8 @@ void main() {
     }
     expect(cleanLine('NVERSA Do87402'), 'nversa');
     expect(cleanLine('ULTRA HD PACIFIC RIM'), 'pacific rim');
+    expect(cleanLine('JUSTICE 1EAGUE'), 'justice league');
+    expect(cleanLine('DEADPOOL 2'), 'deadpool 2');
     expect(detectFormat(['4K UTRAHD']), DiscFormat.uhd);
     expect(detectFormat(['Blusay']), DiscFormat.bluray);
   });

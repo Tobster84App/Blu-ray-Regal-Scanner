@@ -34,7 +34,7 @@
   "formatUhd": "4K UHD",
   "recognizing": "Recognizing text …",
   "preparingImage": "Preparing photo …",
-  "ocrPass": "Text recognition {n} of 2 …",
+  "ocrPass": "Text recognition {n} of 3 …",
   "searchingTitles": "Searching titles {done} of {total} …",
   "scanSummary": "{green} sure · {yellow} unsure · {red} not found · {grey} cut off",
   "acceptAllGreen": "Add all green ({n})",

@@ -82,6 +82,16 @@ bool isFormatToken(String token) {
   return false;
 }
 
+/// „1eague“ → „league“, „sh0w“ → „show“: in Wörtern, die überwiegend aus
+/// Buchstaben bestehen, sind 0/1/5 meist falsch gelesene o/l/s.
+String fixDigitConfusions(String t) {
+  final digits = _hasDigit.allMatches(t).length;
+  if (digits == 0 || digits > 2) return t;
+  final letters = _hasLetter.allMatches(t).length;
+  if (letters < 3) return t;
+  return t.replaceAll('0', 'o').replaceAll('1', 'l').replaceAll('5', 's');
+}
+
 /// Artikel-/Bestellnummern wie „D087402“, „OI60304“, „UFI2329“.
 bool isCodeToken(String t) =>
     t.length >= 4 && _hasDigit.hasMatch(t) && _hasLetter.hasMatch(t) &&
@@ -106,10 +116,12 @@ String? cleanLine(String raw) {
 
   // Lange Ziffernfolgen (Artikel-/Bestellnummern, EAN) entfernen.
   s = s.replaceAll(RegExp(r'(?<![a-z0-9])\d{5,}(?![a-z0-9])'), ' ');
-  // Formatlogos mit Lesefehlern und Bestellnummern wortweise entfernen.
+  // Formatlogos mit Lesefehlern und Bestellnummern wortweise entfernen,
+  // typische Ziffer-statt-Buchstabe-Fehler korrigieren („1EAGUE“).
   s = s
       .split(' ')
       .where((t) => t.isNotEmpty && !isFormatToken(t) && !isCodeToken(t))
+      .map(fixDigitConfusions)
       .join(' ');
   s = s.replaceAll(RegExp(r'\s+'), ' ').trim();
 

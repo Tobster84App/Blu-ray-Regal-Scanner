@@ -52,7 +52,7 @@ void main() {
     expect(results[0].status, MatchStatus.green);
     expect(results[1].best!.id, '3');
     expect(results[2].status, MatchStatus.red); // nur Studio
-    expect(results[3].status, isNot(MatchStatus.green)); // "J0KER" findet die Fake-Suche nicht
+    expect(results[3].best!.id, "9"); // "J0KER" -> Ziffer-Korrektur -> Joker
     expect(results[4].status, MatchStatus.red);
   });
 }
