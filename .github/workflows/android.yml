@@ -107,13 +107,15 @@ jobs:
             --notes-file notes.md --target "$GITHUB_SHA" --latest
           # Nur die 5 neuesten Releases behalten.
           gh release list --limit 100 --json tagName,createdAt \
-            --jq 'sort_by(.createdAt) | reverse | .[5:] | .[].tagName' |
+            --jq '[.[] | select(.tagName | startswith("ocr-") | not)] | sort_by(.createdAt) | reverse | .[5:] | .[].tagName' |
             while read -r old; do gh release delete "$old" --yes --cleanup-tag; done
 
   ocr-eval:
-    name: Erkennung auf Referenzfoto messen (Emulator)
+    name: Erkennung auf Testfotos messen (Emulator)
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Bericht als Release-Datei
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7.0.1
@@ -164,7 +166,22 @@ jobs:
       - name: Bericht anzeigen
         if: always() && steps.fixture.outputs.present == 'true'
         run: |
-          if [ -f build/ocr_report.md ]; then cat build/ocr_report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          if [ -f build/ocr_report.md ]; then
+            cat build/ocr_report.md >> "$GITHUB_STEP_SUMMARY"
+            cat build/ocr_report.md
+          fi
+      # Bericht + Rohzeilen an das Vorab-Release "ocr-latest" hängen
+      # (abrufbar unter .../releases/download/ocr-latest/<datei>).
+      - name: Bericht als Release-Datei
+        if: always() && steps.fixture.outputs.present == 'true' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -f build/ocr_report.md ] || exit 0
+          gh release view ocr-latest >/dev/null 2>&1 || \
+            gh release create ocr-latest --prerelease --latest=false \
+              --title "Erkennungs-Messung (automatisch)" --notes "Wird bei jedem Lauf überschrieben."
+          gh release upload ocr-latest build/ocr_report.md build/ocr_lines.json --clobber
       - uses: actions/upload-artifact@v7.0.2
         if: always() && steps.fixture.outputs.present == 'true'
         with:
