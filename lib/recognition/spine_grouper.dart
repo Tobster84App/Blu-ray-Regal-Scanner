@@ -39,8 +39,12 @@ List<OcrLine> dedupeLines(List<OcrLine> lines, RecognitionConfig cfg) {
     ..sort((a, b) => _quality(b).compareTo(_quality(a)));
   final kept = <OcrLine>[];
   for (final l in filtered) {
-    final dup = kept.any((k) => _sameSpot(k, l));
-    if (!dup) kept.add(l);
+    final twin = kept.where((k) => _sameSpot(k, l)).firstOrNull;
+    if (twin == null) {
+      kept.add(l);
+    } else if (l.text != twin.text && !twin.alternatives.contains(l.text)) {
+      twin.alternatives.add(l.text);
+    }
   }
   return kept;
 }
@@ -180,12 +184,21 @@ List<Spine> groupSpines(
       math.min(imageWidth, raw.right),
       math.min(imageHeight, raw.bottom),
     );
-    final cleaned = <String>[];
-    for (final l in g) {
-      final cl = cleanLine(l.text);
-      if (cl != null) cleaned.add(cl);
+    final cleanedPerLine = [for (final l in g) cleanLine(l.text)];
+    final cleaned = cleanedPerLine.whereType<String>().toList();
+    final primary = cleaned.join(' ');
+    final alts = <String>{};
+    for (var k = 0; k < g.length; k++) {
+      for (final alt in g[k].alternatives.take(2)) {
+        final ca = cleanLine(alt);
+        if (ca == null) continue;
+        final swapped = [...cleanedPerLine]..[k] = ca;
+        final t = swapped.whereType<String>().join(' ');
+        if (t != primary) alts.add(t);
+      }
     }
     spines.add(Spine(
+      altTexts: alts.take(6).toList(),
       box: box,
       polygon: polygon,
       lines: g,

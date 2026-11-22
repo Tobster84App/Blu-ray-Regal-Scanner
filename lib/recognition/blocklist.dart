@@ -79,6 +79,29 @@ bool isFormatToken(String token) {
   if (t.startsWith('bl') && t.length >= 4 && t.length <= 7 && levenshtein(t, 'bluray') <= 2) {
     return true;
   }
+  // „bluraydisc“ zusammengeklebt und verlesen („bluraydlsc“, „blusaydise“).
+  if (t.startsWith('b') && t.length >= 8 && t.length <= 12 && levenshtein(t, 'bluraydisc') <= 3) {
+    return true;
+  }
+  return false;
+}
+
+const _studioWords = [
+  'concorde', 'studiocanal', 'warner', 'universal', 'legendary', 'lionsgate',
+  'paramount', 'columbia', 'disney', 'lucasfilm', 'marvel', 'pixar', 'leonine',
+  'constantin', 'capelight', 'illumination', 'dreamworks', 'eurovideo',
+  'summit', 'entertainment', 'pictures', 'universum',
+];
+
+/// Studioname mit Lesefehler („lionsoate“, „iicasfll“, „wniversa“)? Exakte
+/// Studionamen zählen hier nicht – die können zu einem Titel gehören.
+bool isGarbledStudioToken(String t) {
+  if (t.length < 6) return false;
+  for (final w in _studioWords) {
+    if (t == w) return false;
+    final allowed = w.length >= 8 ? 2 : 1;
+    if ((t.length - w.length).abs() <= allowed && levenshtein(t, w) <= allowed) return true;
+  }
   return false;
 }
 
@@ -120,7 +143,7 @@ String? cleanLine(String raw) {
   // typische Ziffer-statt-Buchstabe-Fehler korrigieren („1EAGUE“).
   s = s
       .split(' ')
-      .where((t) => t.isNotEmpty && !isFormatToken(t) && !isCodeToken(t))
+      .where((t) => t.isNotEmpty && !isFormatToken(t) && !isCodeToken(t) && !isGarbledStudioToken(t))
       .map(fixDigitConfusions)
       .join(' ');
   s = s.replaceAll(RegExp(r'\s+'), ' ').trim();

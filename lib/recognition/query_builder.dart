@@ -50,3 +50,9 @@ List<String> buildFallbackQueries(List<String> cleanedLines, {int max = 6}) {
   }
   return out.take(max).toList();
 }
+
+final _gluedArticle = RegExp(r'(?<![a-z])(the|der|die|das)([a-z]{4,})');
+
+/// Trennt zusammengeklebte Artikel ab: „theflash“ -> „the flash“.
+String splitLeadingArticles(String q) =>
+    q.replaceAllMapped(_gluedArticle, (m) => '${m[1]} ${m[2]}');

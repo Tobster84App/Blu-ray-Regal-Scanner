@@ -36,7 +36,16 @@ double scoreTitle(String title, String spineText) {
   return math.max(tokenScore, _compactScore(t.join(), s.join()));
 }
 
-double _tokenScore(List<String> t, List<String> s) {
+/// Anteil der Buchstaben auf der Hülle, die der Titel erklärt (0..1).
+double spineLetterCoverage(String title, String spineText) {
+  final t = tokenize(title), s = tokenize(spineText);
+  if (t.isEmpty || s.isEmpty) return 0;
+  return _match(t, s).letterCoverage;
+}
+
+double _tokenScore(List<String> t, List<String> s) => _match(t, s).score;
+
+({double score, double letterCoverage}) _match(List<String> t, List<String> s) {
   final usedS = List<bool>.filled(s.length, false);
   final usedT = List<bool>.filled(t.length, false);
   for (var j = 0; j < t.length; j++) {
@@ -90,10 +99,18 @@ double _tokenScore(List<String> t, List<String> s) {
     sWeight += w;
     if (usedS[i]) sMatched += w;
   }
-  if (tWeight == 0 || sWeight == 0) return 0;
+  var letters = 0, matchedLetters = 0;
+  for (var i = 0; i < s.length; i++) {
+    letters += s[i].length;
+    if (usedS[i]) matchedLetters += s[i].length;
+  }
+  if (tWeight == 0 || sWeight == 0) return (score: 0.0, letterCoverage: 0.0);
   final titleCoverage = tMatched / tWeight;
   final spineCoverage = sMatched / sWeight;
-  return titleCoverage * (0.75 + 0.25 * spineCoverage);
+  return (
+    score: titleCoverage * (0.75 + 0.25 * spineCoverage),
+    letterCoverage: letters == 0 ? 0.0 : matchedLetters / letters,
+  );
 }
 
 double _compactScore(String t, String s) {
@@ -122,13 +139,17 @@ bool hasSeriesHint(String rawText) => _seriesHint.hasMatch(normalize(rawText));
 ///
 /// Filme gehen bei sonst gleichem Wert leicht vor Serien – außer der
 /// Rohtext der Hülle enthält einen Serien-Hinweis ([rawText]).
-List<ScoredHit> rankHits(Iterable<SearchHit> hits, String spineText, {String rawText = ''}) {
+List<ScoredHit> rankHits(Iterable<SearchHit> hits, String spineText,
+    {String rawText = '', List<String> altTexts = const []}) {
   final series = hasSeriesHint(rawText);
   final seen = <String>{};
   final scored = <ScoredHit>[];
   for (final h in hits) {
     if (!seen.add(h.key)) continue;
     var score = scoreHit(h, spineText);
+    for (final alt in altTexts) {
+      score = math.max(score, scoreHit(h, alt));
+    }
     final disfavoured = series ? h.type == MediaType.movie : h.type == MediaType.tv;
     if (disfavoured) score *= 0.97;
     scored.add(ScoredHit(h, score));
@@ -141,10 +162,20 @@ List<ScoredHit> rankHits(Iterable<SearchHit> hits, String spineText, {String raw
   return scored;
 }
 
+/// Unter dieser TMDB-Beliebtheit gilt ein Titel als „unbekannt“ – dann nie
+/// automatisch grün (Zufallstreffer wie „Zumbí“ statt „Zombieland“).
+const double minPopularityForGreen = 1.5;
+
+/// So viel der Buchstaben auf der Hülle muss der Titel erklären, damit er
+/// grün werden kann.
+const double minLetterCoverageForGreen = 0.45;
+
 MatchStatus classify(
   List<ScoredHit> ranked, {
   required bool cutOff,
   required RecognitionConfig cfg,
+  String? spineText,
+  List<String> altTexts = const [],
 }) {
   if (cutOff) return MatchStatus.grey;
   if (ranked.isEmpty) return MatchStatus.red;
@@ -163,7 +194,19 @@ MatchStatus classify(
     second = clear ? 0.0 : best;
   }
   if (best >= cfg.greenThreshold && best - second >= cfg.minMargin) {
-    return MatchStatus.green;
+    final pop = top.hit.popularity;
+    final known = pop == null || pop >= minPopularityForGreen;
+    var coverage = 1.0;
+    if (spineText != null) {
+      coverage = 0;
+      for (final text in [spineText, ...altTexts]) {
+        for (final title in {top.hit.title, if (top.hit.originalTitle != null) top.hit.originalTitle!}) {
+          coverage = math.max(coverage, spineLetterCoverage(title, text));
+        }
+      }
+    }
+    if (known && coverage >= minLetterCoverageForGreen) return MatchStatus.green;
+    return MatchStatus.yellow;
   }
   if (best >= cfg.yellowThreshold) return MatchStatus.yellow;
   return MatchStatus.red;

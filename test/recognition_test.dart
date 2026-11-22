@@ -161,6 +161,19 @@ void main() {
       final hits = [hit('1', 'Nobody', year: 2021, pop: 10), hit('2', 'Nobody', year: 2007, pop: 8)];
       expect(classify(rankHits(hits, 'nobody'), cutOff: false, cfg: const RecognitionConfig()), MatchStatus.yellow);
     });
+    test('Unbekannter Kurztitel auf langem Text -> höchstens gelb', () {
+      final hits = [hit('1', 'Phantom', year: 2013, pop: 3)];
+      final r = rankHits(hits, 'phantom prdtokdll');
+      expect(classify(r, cutOff: false, cfg: const RecognitionConfig(), spineText: 'phantom prdtokdll'),
+          MatchStatus.yellow);
+      final obscure = [hit('2', 'Zumbí', year: 2019, pop: 0.3)];
+      expect(classify(rankHits(obscure, 'zumbielanu'), cutOff: false, cfg: const RecognitionConfig(),
+          spineText: 'zumbielanu'), isNot(MatchStatus.green));
+    });
+    test('Artikel abtrennen', () {
+      expect(splitLeadingArticles('theflas'), 'the flas');
+      expect(splitLeadingArticles('dark knight'), 'dark knight');
+    });
     test('Unsinn -> rot', () {
       expect(statusFor('xqz ptrw'), MatchStatus.red);
     });

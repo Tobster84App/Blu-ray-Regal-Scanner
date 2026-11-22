@@ -121,6 +121,9 @@ class OcrLine {
   final double? confidence;
   final List<Pt> corners;
 
+  /// Andere Lesungen derselben Zeile (aus weiteren Durchläufen).
+  final List<String> alternatives = [];
+
   /// Ohne Eckpunkte (Tests): Leserichtung aus der Drehung ableiten.
   static List<Pt> _defaultCorners(Box b, ScanRotation r) {
     final c = b.corners; // tl, tr, br, bl
@@ -201,6 +204,7 @@ class Spine {
     required this.polygon,
     required this.lines,
     required this.cleanedLines,
+    this.altTexts = const [],
     required this.format,
     required this.cutOff,
   });
@@ -213,6 +217,9 @@ class Spine {
 
   /// Zeilen nach Sperrliste (leere entfernt), Reihenfolge wie [lines].
   final List<String> cleanedLines;
+
+  /// Bereinigter Gesamttext mit anderen Lesungen einzelner Zeilen.
+  final List<String> altTexts;
   final DiscFormat? format;
 
   /// Am Bildrand angeschnitten.

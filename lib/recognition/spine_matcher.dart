@@ -5,6 +5,7 @@ import '../metadata/metadata_provider.dart';
 import 'format_detector.dart';
 import 'matcher.dart';
 import 'models.dart';
+import 'blocklist.dart';
 import 'query_builder.dart';
 
 /// Ergebnis für eine Hülle auf dem Foto.
@@ -55,7 +56,7 @@ class SpineMatcher {
   final RecognitionConfig cfg;
 
   Future<SpineResult> match(Spine spine, {required String language}) async {
-    if (!spine.hasText) {
+    if (!spine.hasText || RegExp(r'[a-z]').allMatches(spine.cleanedText).length < 3) {
       return SpineResult(
         box: spine.box,
         polygon: spine.polygon,
@@ -66,8 +67,22 @@ class SpineMatcher {
         candidates: const [],
       );
     }
-    final queries =
-        buildQueries(spine.cleanedLines, max: cfg.maxQueriesPerSpine);
+    final queries = buildQueries(spine.cleanedLines, max: cfg.maxQueriesPerSpine);
+    // Andere Lesungen derselben Zeilen als weitere Suchen (zeilenweise,
+    // weil TMDB alle Wörter verlangt).
+    for (final l in spine.lines) {
+      for (final alt in l.alternatives) {
+        final ca = cleanLine(alt);
+        if (ca == null || queries.contains(ca)) continue;
+        if (queries.length >= cfg.maxQueriesPerSpine + 4) break;
+        queries.add(ca);
+      }
+    }
+    // Vorangestellten Artikel abtrennen: „theflas“ -> „the flas“.
+    for (final q in [...queries]) {
+      final split = splitLeadingArticles(q);
+      if (split != q && !queries.contains(split)) queries.add(split);
+    }
     final hits = <SearchHit>[];
     String? error;
     for (final q in queries) {
@@ -80,10 +95,10 @@ class SpineMatcher {
         error = '$e';
       }
     }
-    var ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText);
+    var ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText, altTexts: spine.altTexts);
     if (ranked.isEmpty || ranked.first.score < cfg.yellowThreshold) {
       // Nichts Brauchbares: Ersatz-Suchen gegen Lesefehler.
-      for (final q in buildFallbackQueries(spine.cleanedLines)) {
+      for (final q in buildFallbackQueries([spine.cleanedText, ...spine.altTexts])) {
         if (queries.contains(q)) continue;
         try {
           hits.addAll(await provider.search(q, language: language));
@@ -91,7 +106,7 @@ class SpineMatcher {
           // ignorieren
         }
       }
-      ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText);
+      ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText, altTexts: spine.altTexts);
     }
     return SpineResult(
       box: spine.box,
@@ -99,7 +114,8 @@ class SpineMatcher {
       rawText: spine.rawText,
       cleanedText: spine.cleanedText,
       format: spine.format,
-      status: classify(ranked, cutOff: spine.cutOff, cfg: cfg),
+      status: classify(ranked, cutOff: spine.cutOff, cfg: cfg,
+          spineText: spine.cleanedText, altTexts: spine.altTexts),
       candidates: ranked.take(3).toList(),
       error: hits.isEmpty ? error : null,
     );

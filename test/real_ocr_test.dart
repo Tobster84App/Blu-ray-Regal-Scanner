@@ -40,6 +40,10 @@ void main() {
     expect(cleanLine('NVERSA Do87402'), 'nversa');
     expect(cleanLine('ULTRA HD PACIFIC RIM'), 'pacific rim');
     expect(cleanLine('JUSTICE 1EAGUE'), 'justice league');
+    expect(cleanLine('JOHN WICK KA PITil / LIONSOATE'), 'john wick ka pitil');
+    expect(cleanLine('Universal Soldier'), 'universal soldier');
+    expect(cleanLine('BLURAYDLSC DIE ZWEI TURME'), 'die zwei turme');
+    expect(cleanLine('BLUSAYDISE'), isNull);
     expect(cleanLine('DEADPOOL 2'), 'deadpool 2');
     expect(detectFormat(['4K UTRAHD']), DiscFormat.uhd);
     expect(detectFormat(['Blusay']), DiscFormat.bluray);
@@ -56,5 +60,12 @@ void main() {
     expect(spineOf('JOKER'), isNot(spineOf('JUSTICE LEAGUE')));
     expect(spineOf('STARWARS'), spineOf('DIE LETZTEN JEDI'));
     expect(spineOf('BOHEMIAN RHAPSODY'), isNot(spineOf('VENOM')));
+  });
+
+  test('Andere Lesungen derselben Zeile bleiben als Alternative erhalten', () {
+    final d = load('shelf_01.jpg');
+    final spines = groupSpines(d.lines, imageWidth: d.w, imageHeight: d.h);
+    final jl = spines.firstWhere((s) => s.lines.any((l) => l.text.startsWith('JUSTICE')));
+    expect([jl.cleanedText, ...jl.altTexts].any((t) => t.contains('justice league')), isTrue);
   });
 }
