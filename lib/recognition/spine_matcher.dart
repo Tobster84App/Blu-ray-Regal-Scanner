@@ -80,7 +80,7 @@ class SpineMatcher {
         error = '$e';
       }
     }
-    final ranked = rankHits(hits, spine.cleanedText);
+    final ranked = rankHits(hits, spine.cleanedText, rawText: spine.rawText);
     return SpineResult(
       box: spine.box,
         polygon: spine.polygon,

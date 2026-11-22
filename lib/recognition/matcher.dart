@@ -78,13 +78,26 @@ double scoreHit(SearchHit hit, String spineText) {
   return best;
 }
 
+final _seriesHint = RegExp(
+    r'(?<![a-z])(staffel|season|serie|series|complete|komplette|episoden|episodes|disc set|disc)(?![a-z])');
+
+/// Steht auf der Hülle etwas, das auf eine Serie hindeutet?
+bool hasSeriesHint(String rawText) => _seriesHint.hasMatch(normalize(rawText));
+
 /// Sortiert die Kandidaten nach Wert (Gleichstand: Beliebtheit).
-List<ScoredHit> rankHits(Iterable<SearchHit> hits, String spineText) {
+///
+/// Filme gehen bei sonst gleichem Wert leicht vor Serien – außer der
+/// Rohtext der Hülle enthält einen Serien-Hinweis ([rawText]).
+List<ScoredHit> rankHits(Iterable<SearchHit> hits, String spineText, {String rawText = ''}) {
+  final series = hasSeriesHint(rawText);
   final seen = <String>{};
   final scored = <ScoredHit>[];
   for (final h in hits) {
     if (!seen.add(h.key)) continue;
-    scored.add(ScoredHit(h, scoreHit(h, spineText)));
+    var score = scoreHit(h, spineText);
+    final disfavoured = series ? h.type == MediaType.movie : h.type == MediaType.tv;
+    if (disfavoured) score *= 0.97;
+    scored.add(ScoredHit(h, score));
   }
   scored.sort((a, b) {
     final d = b.score.compareTo(a.score);
@@ -104,11 +117,16 @@ MatchStatus classify(
   final top = ranked.first;
   final best = top.score;
   var second = ranked.length > 1 ? ranked[1].score : 0.0;
-  if (ranked.length > 1 && _sameTitle(top.hit, ranked[1].hit)) {
-    // Gleicher Titel (z. B. „Dune“ 1984 und 2021): nur grün, wenn einer
-    // deutlich bekannter ist – sonst soll der Mensch wählen.
-    final p1 = top.hit.popularity ?? 0, p2 = ranked[1].hit.popularity ?? 0;
-    second = (p2 > 0 && p1 / p2 >= 3) ? 0.0 : best;
+  if (ranked.length > 1 && best - second < cfg.minMargin) {
+    // Gleichstand (z. B. „Dune“ 1984 und 2021): nur grün, wenn der beste
+    // deutlich bekannter ist als ALLE gleich guten – sonst wählt der Mensch.
+    final p1 = top.hit.popularity ?? 0;
+    final rivals = ranked.skip(1).where((r) => best - r.score < cfg.minMargin);
+    final clear = rivals.every((r) {
+      final p2 = r.hit.popularity ?? 0;
+      return p2 <= 0 || p1 / p2 >= 3;
+    });
+    second = clear ? 0.0 : best;
   }
   if (best >= cfg.greenThreshold && best - second >= cfg.minMargin) {
     return MatchStatus.green;
@@ -116,6 +134,3 @@ MatchStatus classify(
   if (best >= cfg.yellowThreshold) return MatchStatus.yellow;
   return MatchStatus.red;
 }
-
-bool _sameTitle(SearchHit a, SearchHit b) =>
-    normalize(a.title) == normalize(b.title);

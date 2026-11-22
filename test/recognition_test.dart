@@ -142,6 +142,25 @@ void main() {
       expect(bestFor('dungeons dragons ehre unter dieben')!.id, '493922');
       expect(bestFor('dungeons dragons ehre unter dleben')!.id, '493922');
     });
+    test('Gleicher Titel: Film vor Serie, außer Serien-Hinweis', () {
+      final hits = [
+        hit('60735', 'The Flash', year: 2014, pop: 200, type: MediaType.tv),
+        hit('298618', 'The Flash', year: 2023, pop: 60),
+      ];
+      expect(rankHits(hits, 'the flash').first.hit.year, 2023);
+      expect(rankHits(hits, 'the flash', rawText: 'THE FLASH STAFFEL 1').first.hit.year, 2014);
+    });
+    test('Fallout mit "3-Disc Set" -> Serie', () {
+      final hits = [
+        hit('106379', 'Fallout', year: 2024, pop: 120, type: MediaType.tv),
+        hit('1', 'Fallout', year: 2006, pop: 2),
+      ];
+      expect(rankHits(hits, 'fallout', rawText: 'FALLOUT | 3-DISC SET').first.hit.type, MediaType.tv);
+    });
+    test('Gleichstand ohne klaren Favoriten -> gelb', () {
+      final hits = [hit('1', 'Nobody', year: 2021, pop: 10), hit('2', 'Nobody', year: 2007, pop: 8)];
+      expect(classify(rankHits(hits, 'nobody'), cutOff: false, cfg: const RecognitionConfig()), MatchStatus.yellow);
+    });
     test('Unsinn -> rot', () {
       expect(statusFor('xqz ptrw'), MatchStatus.red);
     });
