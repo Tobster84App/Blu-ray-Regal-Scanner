@@ -85,11 +85,19 @@ class OcrService {
             w,
             h,
           );
+          final corners = line.cornerPoints.length == 4
+              ? [
+                  for (final c in line.cornerPoints)
+                    mapPointFromRotated(
+                        Pt(c.x.toDouble(), c.y.toDouble()), rotation, w, h),
+                ]
+              : null;
           lines.add(OcrLine(
             text: line.text,
             box: box,
             rotation: rotation,
             confidence: line.confidence,
+            corners: corners,
           ));
         }
       }

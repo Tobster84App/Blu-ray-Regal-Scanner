@@ -23,7 +23,7 @@ class RecognitionConfig {
     this.edgeMarginFraction = 0.015,
     this.maxQueriesPerSpine = 6,
     this.minLineConfidence = 0.4,
-    this.spineGapFactor = 0.25,
+    this.spineGapFactor = 0.7,
   });
 
   /// Ab diesem Wert ist ein Treffer „sicher“ (grün).
@@ -45,8 +45,9 @@ class RecognitionConfig {
   /// Plattform eine Konfidenz liefert).
   final double minLineConfidence;
 
-  /// Zwei senkrechte Textzeilen gehören zur selben Hülle, wenn der Abstand
-  /// kleiner ist als dieser Faktor mal die typische Zeilendicke.
+  /// Zwei senkrechte Textzeilen gehören zur selben Hülle, wenn ihr Abstand
+  /// quer zur Schrift kleiner ist als dieser Faktor mal die Summe ihrer
+  /// Schrifthöhen.
   final double spineGapFactor;
 
   RecognitionConfig copyWith({double? greenThreshold}) => RecognitionConfig(

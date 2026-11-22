@@ -171,9 +171,60 @@ void main() {
     });
   });
 
+  group('Schräge Hüllen', () {
+    // Schräge Zeile: Mittelpunkt (cx, cy), Länge len, Dicke th, Neigung t
+    // (x-Versatz pro Pixel nach unten), Schrift von oben nach unten.
+    OcrLine slanted(String text, double cx, double cy,
+        {double len = 500, double th = 30, double t = 0.15}) {
+      final u = Pt(t, 1).unit;
+      final n = Pt(-u.y, u.x);
+      final c = Pt(cx, cy);
+      final a = c - u * (len / 2), b = c + u * (len / 2);
+      final corners = [a - n * (th / 2), b - n * (th / 2), b + n * (th / 2), a + n * (th / 2)];
+      return OcrLine(text: text, box: Box.around(corners), rotation: ScanRotation.ccw90, corners: corners);
+    }
+
+    test('schräg stehende Nachbarn werden nicht verschmolzen', () {
+      // Hüllen 60 px auseinander, alle um 0.15 geneigt -> gerade Rechtecke
+      // wären 105 px breit und würden überlappen.
+      final titles = ['JOHN WICK', 'JOKER', 'HOTEL ARTEMIS', 'PACIFIC RIM', 'DUNE'];
+      final spines = groupSpines([
+        for (var i = 0; i < titles.length; i++) slanted(titles[i], 200.0 + i * 60, 400),
+      ], imageWidth: 1000, imageHeight: 800);
+      expect(spines.map((s) => s.cleanedText), titles.map((t) => t.toLowerCase()));
+    });
+
+    test('zwei Zeilen auf derselben schrägen Hülle, verschieden hoch', () {
+      final spines = groupSpines([
+        slanted('JOHN WICK', 300, 300, len: 300),
+        // Unterhalb, auf derselben Achse (x verschiebt sich mit der Neigung)
+        slanted('KAPITEL 3', 300 + 0.15 * 300, 600, len: 150, th: 20),
+        slanted('JOKER', 380, 400),
+      ], imageWidth: 1000, imageHeight: 900);
+      expect(spines.length, 2);
+      expect(spines[0].cleanedText, 'john wick kapitel 3');
+    });
+
+    test('kurze Zeile im breiten Rechteck der Nachbarzeile ist kein Duplikat', () {
+      final spines = groupSpines([
+        slanted('PACIFIC RIM', 300, 400, len: 700, t: 0.25),
+        slanted('DUNE', 360, 400, len: 120),
+      ], imageWidth: 1000, imageHeight: 800);
+      expect(spines.map((s) => s.cleanedText), ['pacific rim', 'dune']);
+    });
+
+    test('Rahmen ist schräg und Antippen trifft nur die eigene Hülle', () {
+      final spines = groupSpines([slanted('JOKER', 300, 400), slanted('DUNE', 360, 400)],
+          imageWidth: 1000, imageHeight: 800);
+      expect(pointInPolygon(const Pt(300, 400), spines[0].polygon), isTrue);
+      expect(pointInPolygon(const Pt(300, 400), spines[1].polygon), isFalse);
+      expect(pointInPolygon(const Pt(360, 400), spines[1].polygon), isTrue);
+    });
+  });
+
   group('Hüllen trennen', () {
     OcrLine v(String t, double x, double w, {double top = 100, double h = 600}) =>
-        OcrLine(text: t, box: Box(x, top, x + w, top + h), rotation: ScanRotation.cw90);
+        OcrLine(text: t, box: Box(x, top, x + w, top + h), rotation: ScanRotation.ccw90);
     OcrLine hz(String t, double x, double w, double y) =>
         OcrLine(text: t, box: Box(x, y, x + w, y + 20), rotation: ScanRotation.none);
 
@@ -199,7 +250,7 @@ void main() {
     test('doppelt erkannte Zeile (zwei Drehungen) zählt einmal', () {
       final spines = groupSpines([
         v('JOKER', 200, 30),
-        OcrLine(text: 'ɹǝʞoſ', box: const Box(201, 101, 229, 699), rotation: ScanRotation.ccw90, confidence: 0.2),
+        OcrLine(text: 'ɹǝʞoſ', box: const Box(201, 101, 229, 699), rotation: ScanRotation.cw90, confidence: 0.2),
       ], imageWidth: 1000, imageHeight: 800);
       expect(spines.single.cleanedLines, ['joker']);
     });

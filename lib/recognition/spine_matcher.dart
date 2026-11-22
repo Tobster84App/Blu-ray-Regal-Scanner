@@ -11,6 +11,7 @@ import 'query_builder.dart';
 class SpineResult {
   SpineResult({
     required this.box,
+    List<Pt>? polygon,
     required this.rawText,
     required this.cleanedText,
     required this.format,
@@ -18,9 +19,12 @@ class SpineResult {
     required this.candidates,
     this.manual = false,
     this.error,
-  });
+  }) : polygon = polygon ?? box.corners;
 
   final Box box;
+
+  /// Schräger Rahmen für die Anzeige.
+  final List<Pt> polygon;
   final String rawText;
   final String cleanedText;
   DiscFormat? format;
@@ -54,6 +58,7 @@ class SpineMatcher {
     if (!spine.hasText) {
       return SpineResult(
         box: spine.box,
+        polygon: spine.polygon,
         rawText: spine.rawText,
         cleanedText: '',
         format: spine.format,
@@ -78,6 +83,7 @@ class SpineMatcher {
     final ranked = rankHits(hits, spine.cleanedText);
     return SpineResult(
       box: spine.box,
+        polygon: spine.polygon,
       rawText: spine.rawText,
       cleanedText: spine.cleanedText,
       format: spine.format,

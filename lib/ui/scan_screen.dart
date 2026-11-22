@@ -38,6 +38,14 @@ class _ScanScreenState extends State<ScanScreen> {
   Rect? _dragRect;
   bool _anyAccepted = false;
 
+  /// Erster Fehler der Titelsuche (z. B. ungültiger TMDB-Schlüssel).
+  String? get _searchError {
+    for (final r in _results) {
+      if (r.error != null) return r.error;
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -80,6 +88,7 @@ class _ScanScreenState extends State<ScanScreen> {
           _results = spines
               .map((s) => SpineResult(
                     box: s.box,
+                    polygon: s.polygon,
                     rawText: s.rawText,
                     cleanedText: s.cleanedText,
                     format: s.format,
@@ -246,6 +255,17 @@ class _ScanScreenState extends State<ScanScreen> {
                 ),
               ],
             ),
+          if (_progress == null && _searchError != null)
+            MaterialBanner(
+              content: Text(l10n.searchFailed(_searchError!)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const SettingsScreen())),
+                  child: Text(l10n.openSettings),
+                ),
+              ],
+            ),
           if (_progress != null) ...[
             const LinearProgressIndicator(),
             Padding(padding: const EdgeInsets.all(8), child: Text(_progress!)),
@@ -336,8 +356,7 @@ class _ScanScreenState extends State<ScanScreen> {
           onTapUp: (d) {
             final p = d.localPosition / scale;
             for (final r in _results.reversed) {
-              final b = r.box;
-              if (p.dx >= b.left && p.dx <= b.right && p.dy >= b.top && p.dy <= b.bottom) {
+              if (pointInPolygon(Pt(p.dx, p.dy), r.polygon)) {
                 _openSpine(r);
                 return;
               }
@@ -365,14 +384,15 @@ class _BoxPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (final r in results) {
-      final rect = Rect.fromLTRB(r.box.left * scale, r.box.top * scale,
-          r.box.right * scale, r.box.bottom * scale);
+      if (r.polygon.length < 3) continue;
+      final path = Path()
+        ..addPolygon([for (final p in r.polygon) Offset(p.x * scale, p.y * scale)], true);
       final color = statusColor(r.status);
       if (r.accepted) {
-        canvas.drawRect(rect, Paint()..color = color.withValues(alpha: 0.35));
+        canvas.drawPath(path, Paint()..color = color.withValues(alpha: 0.35));
       }
-      canvas.drawRect(
-        rect,
+      canvas.drawPath(
+        path,
         Paint()
           ..color = color
           ..style = PaintingStyle.stroke
