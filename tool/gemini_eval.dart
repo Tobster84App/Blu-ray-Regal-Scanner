@@ -1,0 +1,97 @@
+// Messversuch: Erkennt Gemini die Hüllenrücken besser als ML Kit?
+//   GEMINI_MODEL=... TMDB_API_KEY=... dart run tool/gemini_eval.dart [shelf_01.jpg ...]
+// Der Gemini-Schlüssel wird in dieser Cloud-Umgebung vom Proxy eingesetzt
+// (Header x-goog-api-key); lokal: GEMINI_API_KEY setzen.
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:discscanner/metadata/tmdb_provider.dart';
+import 'package:discscanner/recognition/matcher.dart';
+import 'package:discscanner/recognition/models.dart';
+import 'package:discscanner/recognition/spine_matcher.dart';
+import 'package:discscanner/recognition/text_utils.dart';
+import 'package:http/http.dart' as http;
+
+const prompt = '''
+Auf dem Foto stehen Hüllen von Filmen oder Serien (Blu-ray, 4K UHD, DVD) in einem Regal.
+Lies jeden sichtbaren Hüllenrücken von links nach rechts.
+Gib für jede Hülle den Titel genau so an, wie er auf dem Rücken steht – inklusive Zusätzen
+wie „Kapitel 3“, „Uprising“ oder Untertiteln. Schauspielernamen, Studios, Logos und
+Artikelnummern gehören nicht zum Titel.
+Antworte ausschließlich mit JSON:
+[{"title": "...", "format": "UHD|BD|DVD|unbekannt", "cut_off": true/false}]
+cut_off = true, wenn die Hülle am linken oder rechten Bildrand abgeschnitten ist.
+Kannst du einen Titel nicht lesen, setze "title": null.''';
+
+Future<void> main(List<String> args) async {
+  final model = Platform.environment['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
+  final key = Platform.environment['GEMINI_API_KEY'] ?? 'proxy-injected';
+  final expected = (jsonDecode(File('test/fixtures/expected.json').readAsStringSync()) as Map)
+      .cast<String, dynamic>();
+  final photos = args.isNotEmpty
+      ? args
+      : (Directory('test/fixtures').listSync().map((f) => f.uri.pathSegments.last)
+          .where((n) => n.endsWith('.jpg')).toList()..sort());
+  final tmdb = TmdbProvider(apiKey: () => Platform.environment['TMDB_API_KEY'] ?? '');
+  final matcher = SpineMatcher(tmdb);
+  var totalExpected = 0, totalCorrect = 0, totalGreenCorrect = 0, totalWrongGreen = 0;
+  for (final name in photos) {
+    final bytes = File('test/fixtures/$name').readAsBytesSync();
+    final sw = Stopwatch()..start();
+    final res = await http.post(
+      Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent'),
+      headers: {'Content-Type': 'application/json', 'x-goog-api-key': key},
+      body: jsonEncode({
+        'contents': [
+          {
+            'parts': [
+              {'inline_data': {'mime_type': 'image/jpeg', 'data': base64Encode(bytes)}},
+              {'text': prompt},
+            ],
+          },
+        ],
+        'generationConfig': {'responseMimeType': 'application/json', 'temperature': 0},
+      }),
+    );
+    final secs = sw.elapsedMilliseconds / 1000;
+    if (res.statusCode != 200) {
+      stdout.writeln('## $name: Gemini-Fehler ${res.statusCode}: ${res.body.substring(0, res.body.length.clamp(0, 400))}');
+      continue;
+    }
+    final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+    final text = (((body['candidates'] as List).first as Map)['content']['parts'] as List).first['text'] as String;
+    final usage = body['usageMetadata'];
+    final items = (jsonDecode(text) as List).cast<Map<String, dynamic>>();
+    final exp = (expected[name] as List?)?.cast<String>() ?? const [];
+    final expTitles = exp.map((e) => e.replaceFirst('cut:', '')).where((e) => !e.startsWith('?')).toList();
+    stdout.writeln('## $name – ${items.length} Hüllen von Gemini, ${secs.toStringAsFixed(1)} s, Tokens: ${usage?['promptTokenCount']}/${usage?['candidatesTokenCount']}');
+    final found = <String>[];
+    for (final it in items) {
+      final title = it['title'] as String?;
+      if (title == null || title.trim().isEmpty) {
+        stdout.writeln('   ?      (unlesbar)');
+        continue;
+      }
+      final spine = Spine(
+        box: const Box(0, 0, 1, 1), polygon: const Box(0, 0, 1, 1).corners,
+        lines: [OcrLine(text: title, box: const Box(0, 0, 1, 10), rotation: ScanRotation.none)],
+        cleanedLines: [normalize(title)], format: null, cutOff: it['cut_off'] == true,
+      );
+      final r = await matcher.match(spine, language: 'de-DE');
+      final best = r.best;
+      bool isExp(String? t) => t != null && expTitles.any((e) =>
+          normalize(e.replaceAll('?', '')) == normalize(t) || scoreTitle(e.replaceAll('?', ''), t) >= 0.9);
+      final ok = best != null && (isExp(best.title) || isExp(best.originalTitle));
+      if (ok) found.add(best.title);
+      if (ok) totalCorrect++;
+      if (ok && r.status == MatchStatus.green) totalGreenCorrect++;
+      if (!ok && r.status == MatchStatus.green) totalWrongGreen++;
+      stdout.writeln('   ${ok ? '✅' : '❌'} ${r.status.name.padRight(6)} „$title“ ${it['format']} -> ${best?.label ?? '–'}');
+    }
+    totalExpected += expTitles.length;
+    stdout.writeln('   Soll ${expTitles.length}, richtig ${found.length}');
+  }
+  stdout.writeln('\nGESAMT: Soll $totalExpected · richtig erkannt $totalCorrect '
+      '(${totalExpected == 0 ? 0 : (100 * totalCorrect / totalExpected).round()} %) · davon grün $totalGreenCorrect · falsch grün $totalWrongGreen');
+  exit(0);
+}
