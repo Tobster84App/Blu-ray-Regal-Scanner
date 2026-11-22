@@ -28,6 +28,8 @@ jobs:
     name: APK bauen
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # für das Release
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-java@v6.3.0
@@ -59,22 +61,54 @@ jobs:
             echo "Kein Keystore-Secret – APK wird mit Debug-Schlüssel signiert."
           fi
       - run: flutter pub get
-      - name: Release-APK
+      - name: Testversion (mit TMDB-Schlüssel, nur als Artefakt)
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-        run: flutter build apk --release --dart-define=TMDB_API_KEY="$TMDB_API_KEY"
-      - name: APK umbenennen
         run: |
+          flutter build apk --release --dart-define=TMDB_API_KEY="$TMDB_API_KEY"
           NAME=$(grep -oP 'APP_NAME = "\K[^"]+' lib/config/app_config.dart)
-          VER=$(grep -oP '^version: \K\S+' pubspec.yaml)
+          VER=$(grep -oP '^version: \K[^+\s]+' pubspec.yaml)
+          echo "APP_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "APP_VER=$VER" >> "$GITHUB_ENV"
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk "dist/${NAME}-${VER}-${GITHUB_SHA::7}.apk"
-          ls -la dist
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/${NAME}-${VER}-b${GITHUB_RUN_NUMBER}-test.apk"
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: apk
           path: dist/*.apk
           retention-days: 30
+
+      # Öffentliche Version OHNE eingebauten Schlüssel (wird in der App
+      # eingetragen). Fester Link auf die neueste Datei:
+      # https://github.com/<owner>/<repo>/releases/latest/download/<APP_NAME>.apk
+      - name: Öffentliche APK (ohne Schlüssel)
+        if: github.event_name != 'pull_request'
+        run: |
+          flutter build apk --release
+          mkdir -p public
+          cp build/app/outputs/flutter-apk/app-release.apk "public/${APP_NAME}.apk"
+      - name: Release veröffentlichen
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v${APP_VER}-b${GITHUB_RUN_NUMBER}"
+          SHORT="${GITHUB_SHA::7}"
+          {
+            echo "Testversion ${APP_VER} (Build ${GITHUB_RUN_NUMBER}, Zweig ${GITHUB_REF_NAME}, ${SHORT})."
+            echo
+            echo "Installieren: ${APP_NAME}.apk auf dem Android-Handy antippen."
+            echo "Den TMDB-Schlüssel einmal in der App unter Einstellungen eintragen."
+            echo
+            echo "This product uses the TMDB API but is not endorsed or certified by TMDB."
+          } > notes.md
+          gh release create "$TAG" "public/${APP_NAME}.apk" \
+            --title "${APP_NAME} ${APP_VER} – Build ${GITHUB_RUN_NUMBER}" \
+            --notes-file notes.md --target "$GITHUB_SHA" --latest
+          # Nur die 5 neuesten Releases behalten.
+          gh release list --limit 100 --json tagName,createdAt \
+            --jq 'sort_by(.createdAt) | reverse | .[5:] | .[].tagName' |
+            while read -r old; do gh release delete "$old" --yes --cleanup-tag; done
 
   ocr-eval:
     name: Erkennung auf Referenzfoto messen (Emulator)

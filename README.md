@@ -44,11 +44,15 @@ Das Secret wird außerdem für die automatische Messung der Erkennung (Abschnitt
 
 ## 3. APK herunterladen und auf Android installieren
 
-1. Repository öffnen → Reiter **Actions** → oben den neuesten grünen Lauf von **Android** anklicken.
-2. Ganz unten unter **Artifacts** auf **apk** klicken. Du bekommst eine ZIP-Datei; darin liegt `DiscScanner-….apk`.
-3. ZIP auf dem Handy öffnen (oder am PC entpacken und die APK per USB/Google Drive aufs Handy kopieren).
-4. APK antippen. Android fragt beim ersten Mal, ob die App (z. B. „Dateien“ oder „Chrome“) **Apps aus unbekannten Quellen installieren** darf → **Einstellungen** → Schalter einschalten → zurück → **Installieren**.
-5. Google Play Protect kann warnen, weil die App nicht aus dem Play Store kommt → **Trotzdem installieren**.
+**Öffentliche Version (einfachster Weg, ohne eingebauten TMDB-Schlüssel):**
+1. Auf dem Handy in Chrome öffnen: <https://github.com/Tobster84App/Blu-ray-Regal-Scanner/releases/latest/download/DiscScanner.apk>
+   (Übersicht aller Versionen: <https://github.com/Tobster84App/Blu-ray-Regal-Scanner/releases>)
+2. Die heruntergeladene `DiscScanner.apk` antippen (Benachrichtigung oder App „Dateien“ → Downloads).
+3. Nach dem Installieren in der App unter ⋮ → **Einstellungen** den TMDB-Schlüssel eintragen.
+
+**Testversion mit eingebautem Schlüssel (nur angemeldet):** Reiter **Actions** → neuester grüner Lauf → unten unter **Artifacts** auf **apk** (ZIP mit `…-test.apk`). Auf dem Handy dafür im Chrome-Menü „Desktopwebsite“ einschalten, sonst ist der Link nicht anklickbar.
+
+**Installieren:** Android fragt beim ersten Mal, ob die App (z. B. Chrome oder „Dateien“) **Apps aus unbekannten Quellen installieren** darf → **Einstellungen** → Schalter einschalten → zurück → **Installieren**. Warnt Google Play Protect, weil die App nicht aus dem Play Store kommt: **Weitere Details** → **Trotzdem installieren**.
 
 Updates: neue APK genauso installieren. Das klappt nur, wenn sie mit **demselben** Schlüssel signiert ist (siehe 4). Sonst die alte App vorher deinstallieren – dabei geht die Sammlung verloren (Backup kommt in Phase 2).
 

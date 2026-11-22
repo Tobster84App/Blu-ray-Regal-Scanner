@@ -12,6 +12,7 @@ Tobias Kern – programmiert nicht selbst, Windows-PC + Android-Handy, kein Mac.
 - Package-/Bundle-ID `de.planmycinema.discscanner` (Domain plan-my-cinema.de gehört Tobias) – nicht mehr ändern.
 - App-Name nur in `lib/config/app_config.dart` (`APP_NAME`); Android liest ihn per Gradle-Regex, iOS-Anzeigename steht noch zusätzlich in `ios/Runner/Info.plist` (Phase 3 lösen).
 - Flutter 3.50.1 stable. **Material kommt aus `package:material_ui`** (nicht mehr `flutter/material.dart`), Lokalisierungs-Delegates aus `GlobalMaterialLocalizations.delegates` von material_ui.
+- Auslieferung: Artefakt `apk` = Testversion MIT TMDB-Schlüssel (nur angemeldet); bei jedem Push zusätzlich öffentliches GitHub-Release OHNE Schlüssel, fester Link `releases/latest/download/<APP_NAME>.apk`, 5 neueste Releases bleiben.
 - Arbeitszweig `dev`; Tobias übernimmt nach `main`. Workflow `.github/workflows/android.yml` läuft auf main und dev.
 - TMDB-Schlüssel: Secret `TMDB_API_KEY` (dart-define) ODER in der App (flutter_secure_storage) – In-App hat Vorrang. Repo ist öffentlich.
 - Datenbank drift (SQLite), generierte Dateien (`*.g.dart`, `lib/l10n/app_localizations*.dart`) sind eingecheckt.
