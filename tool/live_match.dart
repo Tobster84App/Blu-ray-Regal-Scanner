@@ -31,7 +31,7 @@ const samples = <List<String>>[
   ['STAR WARS', 'DIE LETZTEN JEDI'],
   ['MAD MAX', 'FURY ROAD'],
   ['DEADPOOL'],
-  ['FALLOUT', '3-DISC SET'],
+  ['TOM CRUISE MISSION:IMPOSSIBLE', 'FALLOUT', '3-DISC SET'],
 ];
 
 Future<void> main() async {

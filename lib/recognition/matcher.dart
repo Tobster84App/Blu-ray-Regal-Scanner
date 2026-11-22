@@ -130,7 +130,7 @@ double scoreHit(SearchHit hit, String spineText) {
 }
 
 final _seriesHint = RegExp(
-    r'(?<![a-z])(staffel|season|serie|series|complete|komplette|episoden|episodes|disc set|disc)(?![a-z])');
+    r'(?<![a-z])(staffel|staffeln|season|seasons|serie|series|komplette serie|complete series|episoden|episodes)(?![a-z])');
 
 /// Steht auf der Hülle etwas, das auf eine Serie hindeutet?
 bool hasSeriesHint(String rawText) => _seriesHint.hasMatch(normalize(rawText));

@@ -150,12 +150,15 @@ void main() {
       expect(rankHits(hits, 'the flash').first.hit.year, 2023);
       expect(rankHits(hits, 'the flash', rawText: 'THE FLASH STAFFEL 1').first.hit.year, 2014);
     });
-    test('Fallout mit "3-Disc Set" -> Serie', () {
+    test('„3-Disc Set“ ist kein Serien-Hinweis (Mission: Impossible – Fallout)', () {
       final hits = [
         hit('106379', 'Fallout', year: 2024, pop: 120, type: MediaType.tv),
-        hit('1', 'Fallout', year: 2006, pop: 2),
+        hit('353081', 'Mission: Impossible - Fallout', year: 2018, pop: 40),
       ];
-      expect(rankHits(hits, 'fallout', rawText: 'FALLOUT | 3-DISC SET').first.hit.type, MediaType.tv);
+      expect(rankHits(hits, 'tom cruise mission impossible fallout',
+              rawText: 'TOM CRUISE MISSION:IMPOSSIBLE FALLOUT | 3-DISC SET').first.hit.id, '353081');
+      expect(hasSeriesHint('FALLOUT STAFFEL 1'), isTrue);
+      expect(hasSeriesHint('3-DISC SET'), isFalse);
     });
     test('Gleichstand ohne klaren Favoriten -> gelb', () {
       final hits = [hit('1', 'Nobody', year: 2021, pop: 10), hit('2', 'Nobody', year: 2007, pop: 8)];
