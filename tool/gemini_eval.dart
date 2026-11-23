@@ -75,6 +75,7 @@ Future<void> main(List<String> args) async {
     final expTitles = exp.map((e) => e.replaceFirst('cut:', '')).where((e) => !e.startsWith('?')).toList();
     stdout.writeln('## $name – ${items.length} Hüllen von Gemini, ${secs.toStringAsFixed(1)} s, Tokens: ${usage?['prompt_tokens']}/${usage?['completion_tokens']}');
     final found = <String>[];
+    final pool = [...expTitles]; // jeder Soll-Titel zählt nur einmal
     for (final it in items) {
       final title = it['title'] as String?;
       if (title == null || title.trim().isEmpty) {
@@ -88,17 +89,20 @@ Future<void> main(List<String> args) async {
       );
       final r = await matcher.match(spine, language: 'de-DE');
       final best = r.best;
-      bool isExp(String? t) => t != null && expTitles.any((e) =>
+      int idx(String? t) => t == null ? -1 : pool.indexWhere((e) =>
           normalize(e.replaceAll('?', '')) == normalize(t) || scoreTitle(e.replaceAll('?', ''), t) >= 0.9);
-      final ok = best != null && (isExp(best.title) || isExp(best.originalTitle));
-      if (ok) found.add(best.title);
+      var i = best == null ? -1 : idx(best.title);
+      if (i < 0 && best != null) i = idx(best.originalTitle);
+      final ok = i >= 0;
+      if (ok) pool.removeAt(i);
+      if (ok) found.add(best!.title);
       if (ok) totalCorrect++;
       if (ok && r.status == MatchStatus.green) totalGreenCorrect++;
       if (!ok && r.status == MatchStatus.green) totalWrongGreen++;
       stdout.writeln('   ${ok ? '✅' : '❌'} ${r.status.name.padRight(6)} „$title“ ${it['format']} -> ${best?.label ?? '–'}');
     }
     totalExpected += expTitles.length;
-    stdout.writeln('   Soll ${expTitles.length}, richtig ${found.length}');
+    stdout.writeln('   Soll ${expTitles.length}, richtig ${found.length}${pool.isEmpty ? '' : ' · fehlt: ${pool.join(', ')}'}');
   }
   stdout.writeln('\nGESAMT: Soll $totalExpected · richtig erkannt $totalCorrect '
       '(${totalExpected == 0 ? 0 : (100 * totalCorrect / totalExpected).round()} %) · davon grün $totalGreenCorrect · falsch grün $totalWrongGreen');
