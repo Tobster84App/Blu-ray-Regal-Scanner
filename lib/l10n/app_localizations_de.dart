@@ -456,4 +456,67 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyLinks => 'Weitere Informationen';
+
+  @override
+  String get aiRecognizing => 'KI erkennt die Hüllen …';
+
+  @override
+  String get refiningFrames => 'Rahmen werden verfeinert …';
+
+  @override
+  String aiFailed(String message) {
+    return 'KI-Erkennung fehlgeschlagen ($message). Es wird ML Kit verwendet.';
+  }
+
+  @override
+  String get aiSection => 'KI-Erkennung';
+
+  @override
+  String get aiEnable => 'KI-Erkennung verwenden';
+
+  @override
+  String get aiExplain =>
+      'Mit einem eigenen, kostenlosen Google-Gemini-Schlüssel erkennt die App Hüllen deutlich zuverlässiger und schneller. Ohne Schlüssel arbeitet die App nur auf dem Gerät (ML Kit).';
+
+  @override
+  String get aiGetKey => 'Schlüssel bei Google anlegen';
+
+  @override
+  String get aiGetKeyHelp =>
+      'Mit deinem Google-Konto anmelden → „API-Schlüssel erstellen“ → Schlüssel kopieren und hier einfügen.';
+
+  @override
+  String get aiKey => 'KI-Schlüssel';
+
+  @override
+  String get aiModel => 'Modell';
+
+  @override
+  String get aiBaseUrl => 'Adresse der Schnittstelle';
+
+  @override
+  String get aiAdvanced => 'Erweitert (anderer Anbieter)';
+
+  @override
+  String get aiTest => 'Verbindung testen';
+
+  @override
+  String get aiTestOk => 'Verbindung klappt.';
+
+  @override
+  String get aiConsentTitle => 'Fotos an Google senden?';
+
+  @override
+  String get aiConsentText =>
+      'Bei eingeschalteter KI-Erkennung wird jedes Regalfoto (verkleinert) an Google Gemini gesendet, um die Titel zu lesen. Laut Google werden die Fotos in der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert. Es gilt die Datenschutzerklärung von Google. Hinweis: Google sieht für Nutzer in der EU den kostenpflichtigen Tarif vor, wenn eine App die Schnittstelle bereitstellt.';
+
+  @override
+  String get aiConsentAccept => 'Einverstanden';
+
+  @override
+  String get privacyAiTitle => 'KI-Erkennung (optional)';
+
+  @override
+  String get privacyAi =>
+      'Nur wenn du die KI-Erkennung mit eigenem Schlüssel einschaltest: Jedes Regalfoto wird verkleinert an Google Gemini (bzw. den eingestellten Anbieter) gesendet. Laut Google werden die Inhalte bei Nutzung aus der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert.';
 }

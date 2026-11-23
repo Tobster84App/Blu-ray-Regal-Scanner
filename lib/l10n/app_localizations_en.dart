@@ -456,4 +456,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyLinks => 'More information';
+
+  @override
+  String get aiRecognizing => 'AI is recognizing the cases …';
+
+  @override
+  String get refiningFrames => 'Refining frames …';
+
+  @override
+  String aiFailed(String message) {
+    return 'AI recognition failed ($message). Using ML Kit instead.';
+  }
+
+  @override
+  String get aiSection => 'AI recognition';
+
+  @override
+  String get aiEnable => 'Use AI recognition';
+
+  @override
+  String get aiExplain =>
+      'With your own free Google Gemini key the app recognizes cases much more reliably and faster. Without a key the app works on the device only (ML Kit).';
+
+  @override
+  String get aiGetKey => 'Get a key from Google';
+
+  @override
+  String get aiGetKeyHelp =>
+      'Sign in with your Google account → “Create API key” → copy the key and paste it here.';
+
+  @override
+  String get aiKey => 'AI key';
+
+  @override
+  String get aiModel => 'Model';
+
+  @override
+  String get aiBaseUrl => 'API address';
+
+  @override
+  String get aiAdvanced => 'Advanced (other provider)';
+
+  @override
+  String get aiTest => 'Test connection';
+
+  @override
+  String get aiTestOk => 'Connection works.';
+
+  @override
+  String get aiConsentTitle => 'Send photos to Google?';
+
+  @override
+  String get aiConsentText =>
+      'With AI recognition on, every shelf photo (downscaled) is sent to Google Gemini to read the titles. According to Google, photos are not used for training in the EU but are stored temporarily to detect abuse. Google\'s privacy policy applies. Note: Google requires the paid tier for EU users when an app provides the API.';
+
+  @override
+  String get aiConsentAccept => 'Agree';
+
+  @override
+  String get privacyAiTitle => 'AI recognition (optional)';
+
+  @override
+  String get privacyAi =>
+      'Only if you turn on AI recognition with your own key: every shelf photo is sent, downscaled, to Google Gemini (or the configured provider). According to Google, content from EU use is not used for training but is stored temporarily to detect abuse.';
 }

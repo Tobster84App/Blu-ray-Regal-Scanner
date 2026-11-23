@@ -30,6 +30,9 @@ Messung: `integration_test/ocr_eval_test.dart` im Emulator (CI-Job ocr-eval, Pro
 ## Gemini-Messung (23.11.2026)
 `tool/gemini_eval.dart` (OpenAI-kompatible Schnittstelle `/v1beta/openai/chat/completions`, Schlüssel per Proxy als Bearer – der native Endpunkt verlangt `x-goog-api-key`, das kann das Credential-Formular nicht). `gemini-3.5-flash-lite`: 133/155 richtig (86 %, jeder Soll-Titel zählt einmal; John Wick: Kapitel 2 liest Gemini nur als „John Wick“; Soll-Listen in `test/fixtures/expected.json` sind Claudes Entwurf und teils falsch → real höher), ~4 s und ~1.250/700 Tokens pro Foto, 10 falsch grün. ML Kit im Vergleich: ~31 richtige Grüne. Boxen (`box_2d`, 0–1000) kommen, sind aber ungenau (teils halbe Hülle versetzt, manchmal verschachtelt `[[…]]`). Bedingungen: EU erlaubt, im EWR keine Trainingsnutzung auch im Gratis-Tarif; Weitergabe an andere EU-Nutzer nur mit Paid Services.
 
+## KI-Modus (eingebaut 23.11.2026)
+`lib/recognition/ai_recognizer.dart`: OpenAI-kompatible Schnittstelle, Adresse/Modell/Schlüssel in den Einstellungen (Standard Gemini `gemini-3.5-flash-lite`, Schlüssel jeder Nutzer selbst, Link aistudio.google.com/apikey; einmalige Einwilligung beim Einschalten). Antwortformat per `json_schema` erzwungen + Notfall-Parser. Ablauf im Scan: Foto vorbereiten → KI und ML Kit parallel → KI-Titel sofort bei TMDB suchen und mit ungefähren KI-Rahmen zeigen → nach ML Kit Rahmen per `snapToOcrSpines` (x-Überlappung ≥ 50 %) einrasten. KI-Fehler → Hinweis + ML-Kit-Ergebnis. Treffersuche: Teilnummer auf der Hülle muss im Titel stehen (sonst ×0,8); Haupttitel vor „ – “/„: “ zählt mit ×0,9.
+
 ## Phasen
 1 MVP (in Arbeit) · 2 Export/Backup, KI-Modus (Gemini, eigener Schlüssel – vorher Gratis-Tarif-Bedingungen prüfen und berichten), Poster offline, Feinschliff · 3 iOS (Codemagic).
 

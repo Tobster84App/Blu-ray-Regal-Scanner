@@ -31,10 +31,21 @@ double scoreTitle(String title, String spineText) {
   if (t.isEmpty || s.isEmpty) return 0;
 
   final tokenScore = _tokenScore(t, s);
-  if (tokenScore >= 0.6) return tokenScore;
-  // Rückfall für zusammengeklebte Wörter („JOHNWICK“).
-  return math.max(tokenScore, _compactScore(t.join(), s.join()));
+  var score = tokenScore >= 0.6
+      ? tokenScore
+      // Rückfall für zusammengeklebte Wörter („JOHNWICK“).
+      : math.max(tokenScore, _compactScore(t.join(), s.join()));
+  // Fortsetzungen: Steht eine Teilnummer auf der Hülle („Peter Hase 2“,
+  // „Vol. 2“, „1-5“), muss sie auch im Titel vorkommen.
+  final spineNumbers = s.where(_partNumber.hasMatch).toSet();
+  final titleNumbers = t.where(_partNumber.hasMatch).toSet();
+  if (spineNumbers.isNotEmpty && spineNumbers.difference(titleNumbers).isNotEmpty) {
+    score *= 0.8;
+  }
+  return score;
 }
+
+final _partNumber = RegExp(r'^[1-9]$');
 
 /// Anteil der Buchstaben auf der Hülle, die der Titel erklärt (0..1).
 double spineLetterCoverage(String title, String spineText) {
@@ -120,11 +131,20 @@ double _compactScore(String t, String s) {
   return sim * sim * (0.75 + 0.25 * cover);
 }
 
-/// Bester Wert über Titel, Originaltitel und Namen.
+final _subtitleSplit = RegExp(r'\s+[-–—]\s+|:\s+');
+
+/// Bester Wert über Titel, Originaltitel und Namen. Zusätzlich zählt der
+/// Haupttitel vor einem Untertitel („Peter Hase 2 – Ein Hase macht sich vom
+/// Acker“ → „Peter Hase 2“), mit Abschlag – so gewinnt „Pacific Rim“ weiter
+/// gegen „Pacific Rim: Uprising“, wenn nur „Pacific Rim“ auf der Hülle steht.
 double scoreHit(SearchHit hit, String spineText) {
   var best = 0.0;
   for (final title in {hit.title, if (hit.originalTitle != null) hit.originalTitle!}) {
     best = math.max(best, scoreTitle(title, spineText));
+    final head = title.split(_subtitleSplit).first;
+    if (head != title && tokenize(head).length >= 2) {
+      best = math.max(best, scoreTitle(head, spineText) * 0.9);
+    }
   }
   return best;
 }

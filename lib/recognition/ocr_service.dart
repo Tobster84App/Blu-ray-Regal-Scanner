@@ -34,18 +34,23 @@ const int maxRechecks = 40;
 /// Ausschnitte werden auf diese Schrifthöhe verkleinert (spart Zeit).
 const double recheckTargetThickness = 56;
 
-class _Prepared {
-  _Prepared(this.width, this.height, this.path, this.rotated);
+/// Vorbereitetes Foto (aufrecht gedreht).
+class PreparedImage {
+  PreparedImage(this.width, this.height, this.path, this.rotated, this.aiJpeg);
   final int width, height;
   final String path;
 
   /// Um ±90° gedrehte Kopien (temporär).
   final Map<ScanRotation, String> rotated;
+
+  /// Verkleinerte Fassung für die KI (spart Upload; KI-Kosten hängen nicht
+  /// von der Auflösung ab).
+  final Uint8List aiJpeg;
 }
 
 /// EXIF-Drehung anwenden, als JPEG speichern und ±90° gedrehte Kopien
 /// anlegen (Hintergrund-Isolate).
-Future<_Prepared> _prepare((Uint8List, String, String) args) async {
+Future<PreparedImage> _prepare((Uint8List, String, String) args) async {
   final (bytes, dir, tmp) = args;
   final decoded = img.decodeImage(bytes);
   if (decoded == null) throw Exception('Bild konnte nicht gelesen werden');
@@ -59,7 +64,15 @@ Future<_Prepared> _prepare((Uint8List, String, String) args) async {
     await File(rp).writeAsBytes(img.encodeJpg(img.copyRotate(upright, angle: angle), quality: 92));
     rotated[r] = rp;
   }
-  return _Prepared(upright.width, upright.height, path, rotated);
+  final longEdge = upright.width > upright.height ? upright.width : upright.height;
+  final small = longEdge > 2560
+      ? img.copyResize(upright,
+          width: upright.width >= upright.height ? 2560 : null,
+          height: upright.height > upright.width ? 2560 : null,
+          interpolation: img.Interpolation.average)
+      : upright;
+  final aiJpeg = Uint8List.fromList(img.encodeJpg(small, quality: 88));
+  return PreparedImage(upright.width, upright.height, path, rotated, aiJpeg);
 }
 
 /// Ausschnitt einer Zeile für das Nachlesen.
@@ -120,16 +133,28 @@ Future<List<String>> _cropLines((String, List<List<double>>, String) args) async
 class OcrService {
   final _recognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
-  Future<OcrResult> recognize(
-    Uint8List bytes, {
-    void Function(String step)? onStep,
-  }) async {
+  /// Foto aufrecht drehen und speichern (Hintergrund-Isolate).
+  Future<PreparedImage> prepare(Uint8List bytes) async {
     final dir = await getApplicationDocumentsDirectory();
     final scans = Directory(p.join(dir.path, 'scans'));
     await scans.create(recursive: true);
     final tmp = await getTemporaryDirectory();
+    return compute(_prepare, (bytes, scans.path, tmp.path));
+  }
+
+  Future<OcrResult> recognize(
+    Uint8List bytes, {
+    void Function(String step)? onStep,
+  }) async {
     onStep?.call('prepare');
-    final prepared = await compute(_prepare, (bytes, scans.path, tmp.path));
+    return recognizePrepared(await prepare(bytes), onStep: onStep);
+  }
+
+  Future<OcrResult> recognizePrepared(
+    PreparedImage prepared, {
+    void Function(String step)? onStep,
+  }) async {
+    final tmp = await getTemporaryDirectory();
     final w = prepared.width.toDouble(), h = prepared.height.toDouble();
 
     // Drei Durchläufe: ML Kit findet in den gedrehten Bildern zusätzliche

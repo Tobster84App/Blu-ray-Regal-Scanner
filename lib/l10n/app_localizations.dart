@@ -865,6 +865,120 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Weitere Informationen'**
   String get privacyLinks;
+
+  /// No description provided for @aiRecognizing.
+  ///
+  /// In de, this message translates to:
+  /// **'KI erkennt die Hüllen …'**
+  String get aiRecognizing;
+
+  /// No description provided for @refiningFrames.
+  ///
+  /// In de, this message translates to:
+  /// **'Rahmen werden verfeinert …'**
+  String get refiningFrames;
+
+  /// No description provided for @aiFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'KI-Erkennung fehlgeschlagen ({message}). Es wird ML Kit verwendet.'**
+  String aiFailed(String message);
+
+  /// No description provided for @aiSection.
+  ///
+  /// In de, this message translates to:
+  /// **'KI-Erkennung'**
+  String get aiSection;
+
+  /// No description provided for @aiEnable.
+  ///
+  /// In de, this message translates to:
+  /// **'KI-Erkennung verwenden'**
+  String get aiEnable;
+
+  /// No description provided for @aiExplain.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit einem eigenen, kostenlosen Google-Gemini-Schlüssel erkennt die App Hüllen deutlich zuverlässiger und schneller. Ohne Schlüssel arbeitet die App nur auf dem Gerät (ML Kit).'**
+  String get aiExplain;
+
+  /// No description provided for @aiGetKey.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlüssel bei Google anlegen'**
+  String get aiGetKey;
+
+  /// No description provided for @aiGetKeyHelp.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit deinem Google-Konto anmelden → „API-Schlüssel erstellen“ → Schlüssel kopieren und hier einfügen.'**
+  String get aiGetKeyHelp;
+
+  /// No description provided for @aiKey.
+  ///
+  /// In de, this message translates to:
+  /// **'KI-Schlüssel'**
+  String get aiKey;
+
+  /// No description provided for @aiModel.
+  ///
+  /// In de, this message translates to:
+  /// **'Modell'**
+  String get aiModel;
+
+  /// No description provided for @aiBaseUrl.
+  ///
+  /// In de, this message translates to:
+  /// **'Adresse der Schnittstelle'**
+  String get aiBaseUrl;
+
+  /// No description provided for @aiAdvanced.
+  ///
+  /// In de, this message translates to:
+  /// **'Erweitert (anderer Anbieter)'**
+  String get aiAdvanced;
+
+  /// No description provided for @aiTest.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung testen'**
+  String get aiTest;
+
+  /// No description provided for @aiTestOk.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung klappt.'**
+  String get aiTestOk;
+
+  /// No description provided for @aiConsentTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Fotos an Google senden?'**
+  String get aiConsentTitle;
+
+  /// No description provided for @aiConsentText.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei eingeschalteter KI-Erkennung wird jedes Regalfoto (verkleinert) an Google Gemini gesendet, um die Titel zu lesen. Laut Google werden die Fotos in der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert. Es gilt die Datenschutzerklärung von Google. Hinweis: Google sieht für Nutzer in der EU den kostenpflichtigen Tarif vor, wenn eine App die Schnittstelle bereitstellt.'**
+  String get aiConsentText;
+
+  /// No description provided for @aiConsentAccept.
+  ///
+  /// In de, this message translates to:
+  /// **'Einverstanden'**
+  String get aiConsentAccept;
+
+  /// No description provided for @privacyAiTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'KI-Erkennung (optional)'**
+  String get privacyAiTitle;
+
+  /// No description provided for @privacyAi.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur wenn du die KI-Erkennung mit eigenem Schlüssel einschaltest: Jedes Regalfoto wird verkleinert an Google Gemini (bzw. den eingestellten Anbieter) gesendet. Laut Google werden die Inhalte bei Nutzung aus der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert.'**
+  String get privacyAi;
 }
 
 class _AppLocalizationsDelegate

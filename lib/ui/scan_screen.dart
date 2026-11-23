@@ -5,7 +5,11 @@ import 'package:material_ui/material_ui.dart';
 
 import '../data/collection_repository.dart';
 import '../metadata/metadata_provider.dart';
+import '../config/app_config.dart';
+import '../recognition/ai_recognizer.dart';
+import '../recognition/blocklist.dart';
 import '../recognition/format_detector.dart';
+import '../recognition/text_utils.dart';
 import '../recognition/matcher.dart';
 import '../recognition/models.dart';
 import '../recognition/ocr_service.dart';
@@ -31,7 +35,8 @@ class _ScanScreenState extends State<ScanScreen> {
 
   String? _progress;
   String? _error;
-  OcrResult? _ocrResult;
+  String? _aiError;
+  PreparedImage? _prepared;
   List<SpineResult> _results = [];
   bool _drawMode = false;
   Offset? _dragStart;
@@ -56,7 +61,7 @@ class _ScanScreenState extends State<ScanScreen> {
   void dispose() {
     _ocr.dispose();
     // Foto löschen, wenn nichts übernommen wurde.
-    final path = _ocrResult?.imagePath;
+    final path = _prepared?.path;
     if (path != null && !_anyAccepted) {
       File(path).delete().catchError((_) => File(path));
     }
@@ -67,22 +72,67 @@ class _ScanScreenState extends State<ScanScreen> {
     final l10n = context.l10n;
     setState(() {
       _error = null;
+      _aiError = null;
       _progress = l10n.preparingImage;
     });
     try {
-      final ocr = await _ocr.recognize(widget.imageBytes, onStep: (step) {
-        if (!mounted) return;
+      final prepared = _prepared ?? await _ocr.prepare(widget.imageBytes);
+      if (!mounted) return;
+      setState(() => _prepared = prepared);
+      final settings = _services.settings;
+      final cfg = settings.recognitionConfig;
+      void onStep(String step) {
+        if (!mounted || _results.isNotEmpty) return;
         setState(() => _progress = switch (step) {
-              'prepare' => l10n.preparingImage,
               'ocr' => l10n.ocrPass(1),
               'ocr2' => l10n.ocrPass(2),
               _ => l10n.ocrPass(3),
             });
-      });
-      final cfg = _services.settings.recognitionConfig;
+      }
+
+      final ocrFuture = _ocr.recognizePrepared(prepared, onStep: onStep);
+
+      // KI-Erkennung (falls eingeschaltet): schnell, liefert die Titel.
+      if (settings.aiActive && _services.metadata.isConfigured) {
+        setState(() => _progress = l10n.aiRecognizing);
+        List<AiSpine> ai = const [];
+        try {
+          ai = await settings.aiRecognizer().recognize(prepared.aiJpeg,
+              width: prepared.width.toDouble(), height: prepared.height.toDouble());
+        } on Exception catch (e) {
+          if (mounted) setState(() => _aiError = '$e');
+        }
+        if (ai.isNotEmpty) {
+          final results = await _matchAi(ai, cfg);
+          if (!mounted) return;
+          setState(() {
+            _results = results;
+            _progress = l10n.refiningFrames;
+          });
+          // Rahmen auf die genaueren ML-Kit-Rahmen einrasten.
+          try {
+            final ocr = await ocrFuture;
+            final spines = groupSpines(ocr.lines,
+                imageWidth: ocr.width, imageHeight: ocr.height, cfg: cfg);
+            final snap = snapToOcrSpines(ai, spines);
+            for (var i = 0; i < snap.length && i < results.length; i++) {
+              if (snap[i] >= 0) {
+                results[i].box = spines[snap[i]].box;
+                results[i].polygon = spines[snap[i]].polygon;
+              }
+            }
+          } on Exception {
+            // ungefähre KI-Rahmen behalten
+          }
+          if (mounted) setState(() => _progress = null);
+          return;
+        }
+      }
+
+      // Ohne KI (oder KI fehlgeschlagen): ML Kit.
+      final ocr = await ocrFuture;
       final spines = groupSpines(ocr.lines,
           imageWidth: ocr.width, imageHeight: ocr.height, cfg: cfg);
-      setState(() => _ocrResult = ocr);
       if (!_services.metadata.isConfigured) {
         setState(() {
           _results = spines
@@ -103,7 +153,7 @@ class _ScanScreenState extends State<ScanScreen> {
       final matcher = SpineMatcher(_services.metadata, cfg: cfg);
       final results = await matcher.matchAll(
         spines,
-        language: _services.settings.metadataLanguage,
+        language: settings.metadataLanguage,
         onProgress: (d, t) {
           if (mounted) setState(() => _progress = l10n.searchingTitles(d, t));
         },
@@ -124,6 +174,44 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
+  /// Sucht die KI-Titel bei TMDB.
+  Future<List<SpineResult>> _matchAi(List<AiSpine> ai, RecognitionConfig cfg) async {
+    final l10n = context.l10n;
+    final spines = [
+      for (final a in ai)
+        Spine(
+          box: a.box ?? const Box(0, 0, 0, 0),
+          polygon: (a.box ?? const Box(0, 0, 0, 0)).corners,
+          lines: [OcrLine(text: a.title, box: a.box ?? const Box(0, 0, 0, 0), rotation: ScanRotation.none)],
+          cleanedLines: [cleanLine(a.title) ?? normalize(a.title)],
+          format: a.format,
+          cutOff: a.cutOff,
+        ),
+    ];
+    final matcher = SpineMatcher(_services.metadata, cfg: cfg);
+    final results = await matcher.matchAll(
+      spines,
+      language: _services.settings.metadataLanguage,
+      onProgress: (d, t) {
+        if (mounted) setState(() => _progress = l10n.searchingTitles(d, t));
+      },
+    );
+    return [
+      for (final r in results)
+        SpineResult(
+          box: r.box,
+          polygon: r.polygon,
+          rawText: r.rawText,
+          cleanedText: r.cleanedText,
+          format: r.format,
+          status: r.status,
+          candidates: r.candidates,
+          error: r.error,
+          fromAi: true,
+        ),
+    ];
+  }
+
   Future<AddOutcome?> _accept(SpineResult r, SearchHit hit, Set<DiscFormat> formats) async {
     try {
       final details = await _services.metadata.details(hit.id, hit.type,
@@ -131,7 +219,7 @@ class _ScanScreenState extends State<ScanScreen> {
       final (outcome, _) = await _services.repository.addOrMerge(
         details,
         formats: formats,
-        scanPhotoPath: _ocrResult?.imagePath,
+        scanPhotoPath: _prepared?.path,
       );
       setState(() {
         r.chosen = hit;
@@ -238,7 +326,7 @@ class _ScanScreenState extends State<ScanScreen> {
           IconButton(
             tooltip: l10n.addMissingSpine,
             icon: Icon(_drawMode ? Icons.close : Icons.crop_free),
-            onPressed: _ocrResult == null ? null : () => setState(() => _drawMode = !_drawMode),
+            onPressed: _prepared == null ? null : () => setState(() => _drawMode = !_drawMode),
           ),
         ],
       ),
@@ -247,6 +335,17 @@ class _ScanScreenState extends State<ScanScreen> {
           if (!_services.metadata.isConfigured)
             MaterialBanner(
               content: Text(l10n.noTmdbKey),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const SettingsScreen())),
+                  child: Text(l10n.openSettings),
+                ),
+              ],
+            ),
+          if (_aiError != null)
+            MaterialBanner(
+              content: Text(l10n.aiFailed(_aiError!)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.push(context,
@@ -276,7 +375,7 @@ class _ScanScreenState extends State<ScanScreen> {
               title: Text(l10n.error(_error!)),
               trailing: TextButton(onPressed: _run, child: Text(l10n.retry)),
             ),
-          if (_ocrResult != null && _progress == null)
+          if (_prepared != null && _progress == null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Text(
@@ -292,7 +391,7 @@ class _ScanScreenState extends State<ScanScreen> {
           Expanded(child: _buildImage()),
         ],
       ),
-      bottomNavigationBar: _ocrResult == null
+      bottomNavigationBar: _prepared == null
           ? null
           : SafeArea(
               child: Padding(
@@ -314,22 +413,23 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Widget _buildImage() {
-    final ocr = _ocrResult;
+    final ocr = _prepared;
     if (ocr == null) {
       return Center(child: Image.memory(widget.imageBytes, fit: BoxFit.contain, cacheWidth: 1200));
     }
     return LayoutBuilder(builder: (context, constraints) {
-      final scale = (constraints.maxWidth / ocr.width) < (constraints.maxHeight / ocr.height)
-          ? constraints.maxWidth / ocr.width
-          : constraints.maxHeight / ocr.height;
-      final w = ocr.width * scale, h = ocr.height * scale;
+      final iw = ocr.width.toDouble(), ih = ocr.height.toDouble();
+      final scale = (constraints.maxWidth / iw) < (constraints.maxHeight / ih)
+          ? constraints.maxWidth / iw
+          : constraints.maxHeight / ih;
+      final w = iw * scale, h = ih * scale;
       Widget content = SizedBox(
         width: w,
         height: h,
         child: Stack(
           children: [
             Positioned.fill(
-              child: Image.file(File(ocr.imagePath), fit: BoxFit.fill, cacheWidth: 3000),
+              child: Image.file(File(ocr.path), fit: BoxFit.fill, cacheWidth: 3000),
             ),
             Positioned.fill(
               child: CustomPaint(

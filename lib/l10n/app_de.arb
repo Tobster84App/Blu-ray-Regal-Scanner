@@ -297,5 +297,31 @@
   "privacyYoutube": "„Trailer ansehen“ öffnet YouTube in der YouTube-App oder im Browser. Erst dann gelten die Datenschutzbestimmungen von Google/YouTube.",
   "privacyKeyTitle": "API-Schlüssel",
   "privacyKey": "Ein selbst eingetragener TMDB-Schlüssel wird verschlüsselt auf dem Gerät gespeichert und nur an TMDB gesendet.",
-  "privacyLinks": "Weitere Informationen"
+  "privacyLinks": "Weitere Informationen",
+  "aiRecognizing": "KI erkennt die Hüllen …",
+  "refiningFrames": "Rahmen werden verfeinert …",
+  "aiFailed": "KI-Erkennung fehlgeschlagen ({message}). Es wird ML Kit verwendet.",
+  "@aiFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSection": "KI-Erkennung",
+  "aiEnable": "KI-Erkennung verwenden",
+  "aiExplain": "Mit einem eigenen, kostenlosen Google-Gemini-Schlüssel erkennt die App Hüllen deutlich zuverlässiger und schneller. Ohne Schlüssel arbeitet die App nur auf dem Gerät (ML Kit).",
+  "aiGetKey": "Schlüssel bei Google anlegen",
+  "aiGetKeyHelp": "Mit deinem Google-Konto anmelden → „API-Schlüssel erstellen“ → Schlüssel kopieren und hier einfügen.",
+  "aiKey": "KI-Schlüssel",
+  "aiModel": "Modell",
+  "aiBaseUrl": "Adresse der Schnittstelle",
+  "aiAdvanced": "Erweitert (anderer Anbieter)",
+  "aiTest": "Verbindung testen",
+  "aiTestOk": "Verbindung klappt.",
+  "aiConsentTitle": "Fotos an Google senden?",
+  "aiConsentText": "Bei eingeschalteter KI-Erkennung wird jedes Regalfoto (verkleinert) an Google Gemini gesendet, um die Titel zu lesen. Laut Google werden die Fotos in der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert. Es gilt die Datenschutzerklärung von Google. Hinweis: Google sieht für Nutzer in der EU den kostenpflichtigen Tarif vor, wenn eine App die Schnittstelle bereitstellt.",
+  "aiConsentAccept": "Einverstanden",
+  "privacyAiTitle": "KI-Erkennung (optional)",
+  "privacyAi": "Nur wenn du die KI-Erkennung mit eigenem Schlüssel einschaltest: Jedes Regalfoto wird verkleinert an Google Gemini (bzw. den eingestellten Anbieter) gesendet. Laut Google werden die Inhalte bei Nutzung aus der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert."
 }

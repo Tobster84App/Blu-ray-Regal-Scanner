@@ -11,6 +11,7 @@ class PrivacyScreen extends StatelessWidget {
     ('Google ML Kit', 'https://developers.google.com/ml-kit/terms'),
     ('Google', 'https://policies.google.com/privacy'),
     ('TMDB', 'https://www.themoviedb.org/privacy-policy'),
+    ('Google Gemini API', 'https://aistudio.google.com/docs/terms'),
   ];
 
   @override
@@ -33,6 +34,7 @@ class PrivacyScreen extends StatelessWidget {
           Text(l10n.privacyIntro),
           section(l10n.privacyMlkitTitle, l10n.privacyMlkit),
           section(l10n.privacyTmdbTitle, l10n.privacyTmdb),
+          section(l10n.privacyAiTitle, l10n.privacyAi),
           section(l10n.privacyYoutubeTitle, l10n.privacyYoutube),
           section(l10n.privacyKeyTitle, l10n.privacyKey),
           const SizedBox(height: 20),

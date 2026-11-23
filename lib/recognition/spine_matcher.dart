@@ -13,6 +13,7 @@ class SpineResult {
   SpineResult({
     required this.box,
     List<Pt>? polygon,
+    this.fromAi = false,
     required this.rawText,
     required this.cleanedText,
     required this.format,
@@ -22,10 +23,13 @@ class SpineResult {
     this.error,
   }) : polygon = polygon ?? box.corners;
 
-  final Box box;
+  Box box;
 
   /// Schräger Rahmen für die Anzeige.
-  final List<Pt> polygon;
+  List<Pt> polygon;
+
+  /// Titel stammt aus der KI-Erkennung.
+  final bool fromAi;
   final String rawText;
   final String cleanedText;
   DiscFormat? format;
