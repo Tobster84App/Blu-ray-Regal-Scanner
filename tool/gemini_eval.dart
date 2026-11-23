@@ -1,7 +1,8 @@
 // Messversuch: Erkennt Gemini die Hüllenrücken besser als ML Kit?
 //   GEMINI_MODEL=... TMDB_API_KEY=... dart run tool/gemini_eval.dart [shelf_01.jpg ...]
-// Der Gemini-Schlüssel wird in dieser Cloud-Umgebung vom Proxy eingesetzt
-// (Header x-goog-api-key); lokal: GEMINI_API_KEY setzen.
+// Nutzt die OpenAI-kompatible Gemini-Schnittstelle (Schlüssel als
+// „Authorization: Bearer“). In dieser Cloud-Umgebung setzt der Proxy den
+// Schlüssel ein; lokal: GEMINI_API_KEY setzen.
 import 'dart:convert';
 import 'dart:io';
 
@@ -19,12 +20,12 @@ Gib für jede Hülle den Titel genau so an, wie er auf dem Rücken steht – ink
 wie „Kapitel 3“, „Uprising“ oder Untertiteln. Schauspielernamen, Studios, Logos und
 Artikelnummern gehören nicht zum Titel.
 Antworte ausschließlich mit JSON:
-[{"title": "...", "format": "UHD|BD|DVD|unbekannt", "cut_off": true/false}]
+{"spines": [{"title": "...", "format": "UHD|BD|DVD|unbekannt", "cut_off": true/false}]}
 cut_off = true, wenn die Hülle am linken oder rechten Bildrand abgeschnitten ist.
 Kannst du einen Titel nicht lesen, setze "title": null.''';
 
 Future<void> main(List<String> args) async {
-  final model = Platform.environment['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
+  final model = Platform.environment['GEMINI_MODEL'] ?? 'gemini-3.5-flash-lite';
   final key = Platform.environment['GEMINI_API_KEY'] ?? 'proxy-injected';
   final expected = (jsonDecode(File('test/fixtures/expected.json').readAsStringSync()) as Map)
       .cast<String, dynamic>();
@@ -39,18 +40,24 @@ Future<void> main(List<String> args) async {
     final bytes = File('test/fixtures/$name').readAsBytesSync();
     final sw = Stopwatch()..start();
     final res = await http.post(
-      Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent'),
-      headers: {'Content-Type': 'application/json', 'x-goog-api-key': key},
+      Uri.parse('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'),
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $key'},
       body: jsonEncode({
-        'contents': [
+        'model': model,
+        'temperature': 0,
+        'response_format': {'type': 'json_object'},
+        'messages': [
           {
-            'parts': [
-              {'inline_data': {'mime_type': 'image/jpeg', 'data': base64Encode(bytes)}},
-              {'text': prompt},
+            'role': 'user',
+            'content': [
+              {'type': 'text', 'text': prompt},
+              {
+                'type': 'image_url',
+                'image_url': {'url': 'data:image/jpeg;base64,${base64Encode(bytes)}'},
+              },
             ],
           },
         ],
-        'generationConfig': {'responseMimeType': 'application/json', 'temperature': 0},
       }),
     );
     final secs = sw.elapsedMilliseconds / 1000;
@@ -59,12 +66,14 @@ Future<void> main(List<String> args) async {
       continue;
     }
     final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
-    final text = (((body['candidates'] as List).first as Map)['content']['parts'] as List).first['text'] as String;
-    final usage = body['usageMetadata'];
-    final items = (jsonDecode(text) as List).cast<Map<String, dynamic>>();
+    var text = ((body['choices'] as List).first as Map)['message']['content'] as String;
+    text = text.replaceAll(RegExp(r'^```(json)?|```$', multiLine: true), '').trim();
+    final usage = body['usage'] as Map?;
+    final decoded = jsonDecode(text);
+    final items = ((decoded is Map ? decoded['spines'] : decoded) as List).cast<Map<String, dynamic>>();
     final exp = (expected[name] as List?)?.cast<String>() ?? const [];
     final expTitles = exp.map((e) => e.replaceFirst('cut:', '')).where((e) => !e.startsWith('?')).toList();
-    stdout.writeln('## $name – ${items.length} Hüllen von Gemini, ${secs.toStringAsFixed(1)} s, Tokens: ${usage?['promptTokenCount']}/${usage?['candidatesTokenCount']}');
+    stdout.writeln('## $name – ${items.length} Hüllen von Gemini, ${secs.toStringAsFixed(1)} s, Tokens: ${usage?['prompt_tokens']}/${usage?['completion_tokens']}');
     final found = <String>[];
     for (final it in items) {
       final title = it['title'] as String?;

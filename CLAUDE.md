@@ -27,6 +27,9 @@ ML Kit Latin: EIN Durchlauf über das Foto (ML Kit liest senkrechte Schrift selb
 Offline-Schleife ohne Emulator: `TMDB_API_KEY=eyJproxy dart run tool/replay.dart test/fixtures/ocr_lines_run15.json` (echte Rohdaten + echtes TMDB). Stand 22.11.: 34 grün (≈31 richtig), 52 gelb, 56 rot, 20 grau über 8 Fotos.
 Messung: `integration_test/ocr_eval_test.dart` im Emulator (CI-Job ocr-eval, Profile-Modus) über alle `test/fixtures/*.jpg` (8 Regalfotos von Tobias, 04+05 stark verwackelt; Download zur Laufzeit von raw.githubusercontent), Erwartung bisher nur für shelf_01 in `test/fixtures/shelf_01_expected.dart`; Bericht + Rohzeilen (`ocr_lines.json`) als Artefakt – Rohzeilen zum Nachjustieren in Unit-Tests verwenden.
 
+## Gemini-Messung (23.11.2026)
+`tool/gemini_eval.dart` (OpenAI-kompatible Schnittstelle `/v1beta/openai/chat/completions`, Schlüssel per Proxy als Bearer – der native Endpunkt verlangt `x-goog-api-key`, das kann das Credential-Formular nicht). `gemini-3.5-flash-lite`: 130/155 richtig (84 %, Soll-Listen in `test/fixtures/expected.json` sind Claudes Entwurf und teils falsch → real höher), ~4 s und ~1.250/700 Tokens pro Foto, 10 falsch grün. ML Kit im Vergleich: ~31 richtige Grüne. Boxen (`box_2d`, 0–1000) kommen, sind aber ungenau (teils halbe Hülle versetzt, manchmal verschachtelt `[[…]]`). Bedingungen: EU erlaubt, im EWR keine Trainingsnutzung auch im Gratis-Tarif; Weitergabe an andere EU-Nutzer nur mit Paid Services.
+
 ## Phasen
 1 MVP (in Arbeit) · 2 Export/Backup, KI-Modus (Gemini, eigener Schlüssel – vorher Gratis-Tarif-Bedingungen prüfen und berichten), Poster offline, Feinschliff · 3 iOS (Codemagic).
 
