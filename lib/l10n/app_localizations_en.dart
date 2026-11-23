@@ -519,4 +519,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get privacyAi =>
       'Only if you turn on AI recognition with your own key: every shelf photo is sent, downscaled, to Google Gemini (or the configured provider). According to Google, content from EU use is not used for training but is stored temporarily to detect abuse.';
+
+  @override
+  String get aiNoKey =>
+      'Please paste your Gemini key into the “AI key” field first.';
 }

@@ -519,4 +519,8 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get privacyAi =>
       'Nur wenn du die KI-Erkennung mit eigenem Schlüssel einschaltest: Jedes Regalfoto wird verkleinert an Google Gemini (bzw. den eingestellten Anbieter) gesendet. Laut Google werden die Inhalte bei Nutzung aus der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert.';
+
+  @override
+  String get aiNoKey =>
+      'Bitte zuerst deinen Gemini-Schlüssel ins Feld „KI-Schlüssel“ einfügen.';
 }

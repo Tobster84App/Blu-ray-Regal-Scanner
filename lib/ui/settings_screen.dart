@@ -217,6 +217,7 @@ class _AiSettingsState extends State<_AiSettings> {
 
   Future<void> _toggle(bool on) async {
     final l10n = context.l10n;
+    if (on && _key.text.trim().isEmpty) showSnack(context, l10n.aiNoKey);
     if (on) {
       final ok = await showDialog<bool>(
         context: context,
@@ -242,6 +243,10 @@ class _AiSettingsState extends State<_AiSettings> {
 
   Future<void> _test() async {
     final l10n = context.l10n;
+    if (_key.text.trim().isEmpty) {
+      showSnack(context, l10n.aiNoKey);
+      return;
+    }
     setState(() => _testing = true);
     await _save();
     try {

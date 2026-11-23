@@ -146,5 +146,6 @@
   "aiConsentText": "With AI recognition on, every shelf photo (downscaled) is sent to Google Gemini to read the titles. According to Google, photos are not used for training in the EU but are stored temporarily to detect abuse. Google's privacy policy applies. Note: Google requires the paid tier for EU users when an app provides the API.",
   "aiConsentAccept": "Agree",
   "privacyAiTitle": "AI recognition (optional)",
-  "privacyAi": "Only if you turn on AI recognition with your own key: every shelf photo is sent, downscaled, to Google Gemini (or the configured provider). According to Google, content from EU use is not used for training but is stored temporarily to detect abuse."
+  "privacyAi": "Only if you turn on AI recognition with your own key: every shelf photo is sent, downscaled, to Google Gemini (or the configured provider). According to Google, content from EU use is not used for training but is stored temporarily to detect abuse.",
+  "aiNoKey": "Please paste your Gemini key into the “AI key” field first."
 }

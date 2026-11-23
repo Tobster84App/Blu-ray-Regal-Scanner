@@ -323,5 +323,6 @@
   "aiConsentText": "Bei eingeschalteter KI-Erkennung wird jedes Regalfoto (verkleinert) an Google Gemini gesendet, um die Titel zu lesen. Laut Google werden die Fotos in der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert. Es gilt die Datenschutzerklärung von Google. Hinweis: Google sieht für Nutzer in der EU den kostenpflichtigen Tarif vor, wenn eine App die Schnittstelle bereitstellt.",
   "aiConsentAccept": "Einverstanden",
   "privacyAiTitle": "KI-Erkennung (optional)",
-  "privacyAi": "Nur wenn du die KI-Erkennung mit eigenem Schlüssel einschaltest: Jedes Regalfoto wird verkleinert an Google Gemini (bzw. den eingestellten Anbieter) gesendet. Laut Google werden die Inhalte bei Nutzung aus der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert."
+  "privacyAi": "Nur wenn du die KI-Erkennung mit eigenem Schlüssel einschaltest: Jedes Regalfoto wird verkleinert an Google Gemini (bzw. den eingestellten Anbieter) gesendet. Laut Google werden die Inhalte bei Nutzung aus der EU nicht zum Training verwendet, aber zeitweise zur Missbrauchserkennung gespeichert.",
+  "aiNoKey": "Bitte zuerst deinen Gemini-Schlüssel ins Feld „KI-Schlüssel“ einfügen."
 }
